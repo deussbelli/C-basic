@@ -1,0 +1,2677 @@
+
+
+
+//20 балів. ООП, бібліотека STL
+Визначити базовий тип «Електроприлад» (назва, фірма, ціна) та 2 похідні від нього типи: «Порохотяг» (потужність, колір), «Пральна машина» (кількість програм, об'єм). 
+В текстовому файлі задано дані про 7 різних електроприладів. Зчитати дані в один контейнер і вивести у Файл 1 всі електроприлади, посортовані за назвою із
+зазначенням їх кількості. Вивести у Файл2 список назв та загальну вартість електроприладів вказаної фірми.//
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+#include <map>
+
+using namespace std;
+
+// Базовий клас "Електроприлад"
+class Electropribor {
+protected:
+    string name;
+    string company;
+    double price;
+
+public:
+    Electropribor(const string& name, const string& company, double price)
+        : name(name), company(company), price(price) {}
+
+    virtual ~Electropribor() {}
+
+    // Функція для отримання загальної вартості електроприладу
+    virtual double getTotalPrice() const {
+        return price;
+    }
+
+    // Функція для виведення інформації про електроприлад
+    virtual void printInfo() const {
+        cout << "Name: " << name << ", Company: " << company << ", Price: " << price << endl;
+    }
+
+    // Функція для запису інформації про електроприлад у файл
+    void writeToFile(ofstream& file) const {
+        file << "Name: " << name << ", Company: " << company << ", Price: " << price << endl;
+    }
+};
+
+// Похідний клас "Порохотяг"
+class Porokhotyag : public Electropribor {
+private:
+    int power;
+    string color;
+
+public:
+    Porokhotyag(const string& name, const string& company, double price, int power, const string& color)
+        : Electropribor(name, company, price), power(power), color(color) {}
+
+    // Перевизначення функції для отримання загальної вартості електроприладу
+    double getTotalPrice() const override {
+        return price;
+    }
+
+    // Перевизначення функції для виведення інформації про електроприлад
+    void printInfo() const override {
+        cout << "Name: " << name << ", Company: " << company << ", Price: " << price
+             << ", Power: " << power << ", Color: " << color << endl;
+    }
+};
+
+// Похідний клас "Пральна машина"
+class PralnaMashyna : public Electropribor {
+private:
+    int programCount;
+    double volume;
+
+public:
+    PralnaMashyna(const string& name, const string& company, double price, int programCount, double volume)
+        : Electropribor(name, company, price), programCount(programCount), volume(volume) {}
+
+    // Перевизначення функції для отримання загальної вартості електроприладу
+    double getTotalPrice() const override {
+        return price;
+    }
+
+    // Перевизначення функції для виведення інформації про електроприлад
+    void printInfo() const override {
+        cout << "Name: " << name << ", Company: " << company << ", Price: " << price
+             << ", Program Count: " << programCount << ", Volume: " << volume << endl;
+    }
+};
+
+int main() {
+    ifstream inputFile("input.txt");
+    ofstream file1("output1.txt");
+    ofstream file2("output2.txt");
+
+    if (!inputFile.is_open() || !file1.is_open() || !file2.is_open()) {
+        cout << "Failed to open files." << endl;
+        return 1;
+    }
+
+    vector<Electropribor*> electropribors;
+    map<string, double> companyTotalPrice;
+
+    // Зчитування даних про електроприлади з файлу
+    string type, name, company, color;
+    double price, volume;
+    int power, programCount;
+
+    while (inputFile >> type) {
+        if (type == "Electropribor") {
+            inputFile >> name >> company >> price;
+            Electropribor* electropribor = new Electropribor(name, company, price);
+            electropribors.push_back(electropribor);
+            companyTotalPrice[company] += price;
+        } else if (type == "Porokhotyag") {
+            inputFile >> name >> company >> price >> power >> color;
+            Porokhotyag* porokhotyag = new Porokhotyag(name, company, price, power, color);
+            electropribors.push_back(porokhotyag);
+            companyTotalPrice[company] += price;
+        } else if (type == "PralnaMashyna") {
+            inputFile >> name >> company >> price >> programCount >> volume;
+            PralnaMashyna* pralnaMashyna = new PralnaMashyna(name, company, price, programCount, volume);
+            electropribors.push_back(pralnaMashyna);
+            companyTotalPrice[company] += price;
+        }
+    }
+
+    // Сортування електроприладів за назвою
+    sort(electropribors.begin(), electropribors.end(),
+        [](const Electropribor* a, const Electropribor* b) {
+            return a->getTotalPrice() < b->getTotalPrice();
+        });
+
+    // Запис електроприладів у Файл 1
+    for (const Electropribor* electropribor : electropribors) {
+        electropribor->writeToFile(file1);
+    }
+
+    // Виведення списку назв та загальної вартості електроприладів вказаної фірми у Файл 2
+    for (const auto& pair : companyTotalPrice) {
+        file2 << "Company: " << pair.first << ", Total Price: " << pair.second << endl;
+    }
+
+    // Закриття файлів і звільнення пам'яті
+    inputFile.close();
+    file1.close();
+    file2.close();
+
+    for (Electropribor* electropribor : electropribors) {
+        delete electropribor;
+    }
+
+    return 0;
+}
+
+ТХТ
+Electropribor Laptop Lenovo 1500
+Porokhotyag ElectricFan Panasonic 500 50 Blue
+PralnaMashyna WashingMachine Samsung 2000 5 10
+Electropribor Smartphone Apple 1000
+
+
+
+
+
+
+
+
+
+//1. Визначити два типи «Працівник» (ПІП, посада, зарплата) та «Учень» (ПІП, група,
+спеціальність). Визначити тип «ПТУ» (назва,адреса, список працівників та список
+учнів).
+В текстовому файлі задано дані про 3 ПТУ міста. Зчитати дані у масив і вивести у
+Файл1 список всіх спеціальностей даного ПТУ (без повторів) та вказати кількість
+учнів за кожною спеціальністю. Видрукувати у Файл2 посортованих за зарплатою
+всіх працівників того ПТУ, в якому навчаються найбільше студентів.//
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <algorithm>
+
+using namespace std;
+
+class Worker {
+public:
+    string name;
+    string position;
+    int salary;
+
+    Worker(const string& name, const string& position, int salary) {
+        this->name = name;
+        this->position = position;
+        this->salary = salary;
+    }
+};
+
+class Student {
+public:
+    string name;
+    string group;
+    string specialty;
+
+    Student(const string& name, const string& group, const string& specialty) {
+        this->name = name;
+        this->group = group;
+        this->specialty = specialty;
+    }
+};
+
+class PTU {
+public:
+    string name;
+    string address;
+    vector<Worker> workers;
+    vector<Student> students;
+
+    PTU(const string& name, const string& address) {
+        this->name = name;
+        this->address = address;
+    }
+
+    void addWorker(const Worker& worker) {
+        workers.push_back(worker);
+    }
+
+    void addStudent(const Student& student) {
+        students.push_back(student);
+    }
+};
+
+bool sortBySalary(const Worker& worker1, const Worker& worker2) {
+    return worker1.salary > worker2.salary;
+}
+
+int main() {
+    vector<PTU> ptuList;
+
+    ifstream inputFile("data.txt");
+    if (!inputFile) {
+        cout << "Failed to open the input file." << endl;
+        return 1;
+    }
+
+    string line;
+    while (getline(inputFile, line)) {
+        stringstream ss(line);
+        string ptuName, ptuAddress, workerName, workerPosition;
+        int workerSalary;
+        string studentName, studentGroup, studentSpecialty;
+
+        getline(ss, ptuName, ',');
+        getline(ss, ptuAddress, ',');
+        getline(ss, workerName, ',');
+        getline(ss, workerPosition, ',');
+        ss >> workerSalary;
+        ss.ignore();
+        getline(ss, studentName, ',');
+        getline(ss, studentGroup, ',');
+        getline(ss, studentSpecialty, ',');
+
+        bool ptuExists = false;
+        for (PTU& ptu : ptuList) {
+            if (ptu.name == ptuName && ptu.address == ptuAddress) {
+                ptu.addWorker(Worker(workerName, workerPosition, workerSalary));
+                ptu.addStudent(Student(studentName, studentGroup, studentSpecialty));
+                ptuExists = true;
+                break;
+            }
+        }
+
+        if (!ptuExists) {
+            PTU newPTU(ptuName, ptuAddress);
+            newPTU.addWorker(Worker(workerName, workerPosition, workerSalary));
+            newPTU.addStudent(Student(studentName, studentGroup, studentSpecialty));
+            ptuList.push_back(newPTU);
+        }
+    }
+
+    inputFile.close();
+
+    ofstream outputFile1("File1.txt");
+    if (!outputFile1) {
+        cout << "Failed to open File1.txt for writing." << endl;
+        return 1;
+    }
+
+    ofstream outputFile2("File2.txt");
+    if (!outputFile2) {
+        cout << "Failed to open File2.txt for writing." << endl;
+        return 1;
+    }
+
+    PTU* maxStudentPTU = nullptr;
+    int maxStudentCount = 0;
+
+    for (const PTU& ptu : ptuList) {
+        map<string, int> specialtyCount;
+
+        for (const Student& student : ptu.students) {
+            specialtyCount[student.specialty]++;
+        }
+
+        outputFile1 << "PTU Name: " << ptu.name << ", Address: " << ptu.address << endl;
+        outputFile1 << "Specialties:" << endl;
+
+        for (const auto& pair : specialtyCount) {
+            outputFile1 << pair.first << ": " << pair.second << " students" << endl;
+        }
+
+        outputFile1 << endl;
+
+        if (ptu.students.size() > maxStudentCount) {
+            maxStudentCount = ptu.students.size();
+            maxStudentPTU = &const_cast<PTU&>(ptu);
+        }
+    }
+
+    if (maxStudentPTU != nullptr) {
+        vector<Worker> workers = maxStudentPTU->workers;
+        sort(workers.begin(), workers.end(), sortBySalary);
+
+        outputFile2 << "PTU Name: " << maxStudentPTU->name << ", Address: " << maxStudentPTU->address << endl;
+        outputFile2 << "Workers sorted by salary:" << endl;
+
+        for (const Worker& worker : workers) {
+            outputFile2 << "Name: " << worker.name << ", Position: " << worker.position << ", Salary: " << worker.salary << endl;
+        }
+    }
+
+    outputFile1.close();
+    outputFile2.close();
+
+    return 0;
+}
+
+TXT
+PTU1,Address1,Worker1,Position1,5000,Student1,Group1,Specialty1
+PTU1,Address1,Worker2,Position2,6000,Student2,Group1,Specialty2
+PTU1,Address1,Worker3,Position3,4000,Student3,Group2,Specialty1
+PTU2,Address2,Worker4,Position1,5500,Student4,Group3,Specialty3
+PTU2,Address2,Worker5,Position2,4500,Student5,Group3,Specialty3
+PTU2,Address2,Worker6,Position3,7000,Student6,Group4,Specialty4
+PTU3,Address3,Worker7,Position1,3000,Student7,Group5,Specialty5
+PTU3,Address3,Worker8,Position2,3500,Student8,Group5,Specialty5
+PTU3,Address3,Worker9,Position3,5500,Student9,Group6,Specialty6
+
+
+
+
+
+
+
+
+
+//2. Визначити абстрактний тип «Тварина»(назва, рік народження), похідні від нього
+типи «Кінь» (масть,порода) та «Осел» (вид, висота), а також похідний від цих двох
+типів тип «Мул» (кличка).
+В текстовому файлі задано змішані дані про коней, віслюків та мулів. Зчитати ці
+дані у один масив і вивести у Файл1 відсортовані за роком народження всіх тварин.
+У Файл2 вивести коней білої масті та віслюків висоти не більше 1,5 метра з
+вказанням їх кількості.//
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+class Animal {
+protected:
+    std::string name;
+    int birthYear;
+
+public:
+    Animal(const std::string& _name, int _birthYear) : name(_name), birthYear(_birthYear) {}
+
+    virtual void printDetails(std::ostream& os) const {
+        os << "Name: " << name << ", Birth Year: " << birthYear;
+    }
+
+    bool operator<(const Animal& other) const {
+        return birthYear < other.birthYear;
+    }
+};
+
+class Horse : public Animal {
+private:
+    std::string coatColor;
+    std::string breed;
+
+public:
+    Horse(const std::string& _name, int _birthYear, const std::string& _coatColor, const std::string& _breed)
+        : Animal(_name, _birthYear), coatColor(_coatColor), breed(_breed) {}
+
+    void printDetails(std::ostream& os) const override {
+        Animal::printDetails(os);
+        os << ", Coat Color: " << coatColor << ", Breed: " << breed;
+    }
+
+    const std::string& getCoatColor() const {
+        return coatColor;
+    }
+};
+
+class Donkey : public Animal {
+private:
+    std::string species;
+    double height;
+
+public:
+    Donkey(const std::string& _name, int _birthYear, const std::string& _species, double _height)
+        : Animal(_name, _birthYear), species(_species), height(_height) {}
+
+    void printDetails(std::ostream& os) const override {
+        Animal::printDetails(os);
+        os << ", Species: " << species << ", Height: " << height;
+    }
+
+    double getHeight() const {
+        return height;
+    }
+};
+
+class Mule : public Animal {
+private:
+    std::string coatColor;
+    std::string breed;
+    std::string species;
+    double height;
+    std::string nickname;
+
+public:
+    Mule(const std::string& _name, int _birthYear, const std::string& _coatColor, const std::string& _breed,
+        const std::string& _species, double _height, const std::string& _nickname)
+        : Animal(_name, _birthYear), coatColor(_coatColor), breed(_breed), species(_species), height(_height), nickname(_nickname) {}
+
+    void printDetails(std::ostream& os) const override {
+        Animal::printDetails(os);
+        os << ", Coat Color: " << coatColor << ", Breed: " << breed << ", Species: " << species << ", Height: " << height << ", Nickname: " << nickname;
+    }
+};
+
+int main() {
+    std::ifstream inputFile("animals.txt");
+    if (!inputFile) {
+        std::cout << "Failed to open input file." << std::endl;
+        return 1;
+    }
+
+    std::vector<Animal*> animals;
+    std::string name, coatColor, breed, species, nickname;
+    int birthYear;
+    double height;
+
+    char animalType;
+    while (inputFile >> animalType) {
+        if (animalType == 'H') {
+            inputFile >> name >> birthYear >> coatColor >> breed;
+            animals.push_back(new Horse(name, birthYear, coatColor, breed));
+        } else if (animalType == 'D') {
+            inputFile >> name >> birthYear >> species >> height;
+            animals.push_back(new Donkey(name, birthYear, species, height));
+        } else if (animalType == 'M') {
+            inputFile >> name >> birthYear >> coatColor >> breed >> species >> height >> nickname;
+            animals.push_back(new Mule(name, birthYear, coatColor, breed, species, height, nickname));
+        }
+    }
+
+    inputFile.close();
+
+    std::sort(animals.begin(), animals.end(), [](const Animal* a, const Animal* b) {
+        return *a < *b;
+    });
+
+    std::ofstream file1("File1.txt");
+    if (!file1) {
+        std::cout << "Failed to open File1.txt for writing." << std::endl;
+        return 1;
+    }
+
+    for (const Animal* animal : animals) {
+        animal->printDetails(file1);
+        file1 << std::endl;
+    }
+
+    file1.close();
+
+    int whiteHorsesCount = 0, shortDonkeysCount = 0;
+    std::ofstream file2("File2.txt");
+    if (!file2) {
+        std::cout << "Failed to open File2.txt for writing." << std::endl;
+        return 1;
+    }
+
+    for (const Animal* animal : animals) {
+        const Horse* horse = dynamic_cast<const Horse*>(animal);
+        if (horse && horse->getCoatColor() == "White") {
+            horse->printDetails(file2);
+            file2 << std::endl;
+            whiteHorsesCount++;
+        }
+
+        const Donkey* donkey = dynamic_cast<const Donkey*>(animal);
+        if (donkey && donkey->getHeight() <= 1.5) {
+            donkey->printDetails(file2);
+            file2 << std::endl;
+            shortDonkeysCount++;
+        }
+    }
+
+    file2 << "Number of white horses: " << whiteHorsesCount << std::endl;
+    file2 << "Number of donkeys with height <= 1.5m: " << shortDonkeysCount << std::endl;
+
+    file2.close();
+
+    for (Animal* animal : animals) {
+        delete animal;
+    }
+
+    return 0;
+}
+
+TXT
+H Horse1 2010 Brown Arabian
+D Donkey1 2008 WildAss 1.2
+M Mule1 2015 White Crossbred WildAss 1.3 Molly
+H Horse2 2005 White Thoroughbred
+D Donkey2 2012 Domestic 1.4
+M Mule2 2018 Brown Crossbred Domestic 1.2 Mulan
+
+
+
+
+
+
+
+
+
+
+
+
+//3. Визначити тип «Ювелірна прикраса»(назва, метал, вага, ціна) та тип «Ювелірний
+магазин»(адреса, кількість прикрас, список прикрас).
+В текстовому файлі задано дані про 4 ювелірні магазини. Ввести дані в масив,
+видрукувати у текстовий файл список всіх назв металу (без повторів), що присутні
+у ювелірних виробах магазинів із зазначенням кількості таких виробів. В інший
+текстовий файл вивести посортовані за назвою прикраси лише з тих магазинів,
+загальна сума виробів в яких не менше 500.//
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <set>
+#include <algorithm>
+
+class Jewelry {
+protected:
+    std::string name;
+    std::string metal;
+    double weight;
+    double price;
+
+public:
+    Jewelry(const std::string& _name, const std::string& _metal, double _weight, double _price)
+        : name(_name), metal(_metal), weight(_weight), price(_price) {}
+
+    const std::string& getName() const {
+        return name;
+    }
+
+    const std::string& getMetal() const {
+        return metal;
+    }
+
+    double getWeight() const {
+        return weight;
+    }
+
+    double getPrice() const {
+        return price;
+    }
+};
+
+class JewelryStore {
+private:
+    std::string address;
+    int jewelryCount;
+    std::vector<Jewelry> jewelries;
+
+public:
+    JewelryStore(const std::string& _address, int _jewelryCount, const std::vector<Jewelry>& _jewelries)
+        : address(_address), jewelryCount(_jewelryCount), jewelries(_jewelries) {}
+
+    const std::string& getAddress() const {
+        return address;
+    }
+
+    int getJewelryCount() const {
+        return jewelryCount;
+    }
+
+    const std::vector<Jewelry>& getJewelries() const {
+        return jewelries;
+    }
+};
+
+void readJewelryStores(const std::string& filename, std::vector<JewelryStore>& jewelryStores) {
+    std::ifstream inputFile(filename);
+    if (!inputFile) {
+        std::cout << "Failed to open input file." << std::endl;
+        return;
+    }
+
+    std::string address, name, metal;
+    double weight, price;
+    int jewelryCount;
+
+    while (inputFile >> address >> jewelryCount) {
+        std::vector<Jewelry> jewelries;
+        for (int i = 0; i < jewelryCount; i++) {
+            inputFile >> name >> metal >> weight >> price;
+            jewelries.push_back(Jewelry(name, metal, weight, price));
+        }
+        jewelryStores.push_back(JewelryStore(address, jewelryCount, jewelries));
+    }
+
+    inputFile.close();
+}
+
+void writeMetalList(const std::string& filename, const std::vector<JewelryStore>& jewelryStores) {
+    std::ofstream outputFile(filename);
+    if (!outputFile) {
+        std::cout << "Failed to open output file." << std::endl;
+        return;
+    }
+
+    std::set<std::string> metals;
+    for (const JewelryStore& store : jewelryStores) {
+        const std::vector<Jewelry>& jewelries = store.getJewelries();
+        for (const Jewelry& jewelry : jewelries) {
+            metals.insert(jewelry.getMetal());
+        }
+    }
+
+    for (const std::string& metal : metals) {
+        int jewelryCount = 0;
+        for (const JewelryStore& store : jewelryStores) {
+            const std::vector<Jewelry>& jewelries = store.getJewelries();
+            for (const Jewelry& jewelry : jewelries) {
+                if (jewelry.getMetal() == metal) {
+                    jewelryCount++;
+                }
+            }
+        }
+        outputFile << metal << ": " << jewelryCount << std::endl;
+    }
+
+    outputFile.close();
+}
+
+bool compareByName(const Jewelry& jewelry1, const Jewelry& jewelry2) {
+    return jewelry1.getName() < jewelry2.getName();
+}
+
+void writeSortedJewelries(const std::string& filename, const std::vector<JewelryStore>& jewelryStores) {
+    std::ofstream outputFile(filename);
+    if (!outputFile) {
+        std::cout << "Failed to open output file." << std::endl;
+        return;
+    }
+
+    for (const JewelryStore& store : jewelryStores) {
+        const std::vector<Jewelry>& jewelries = store.getJewelries();
+        double totalValue = 0.0;
+
+        std::vector<Jewelry> sortedJewelries(jewelries);
+        std::sort(sortedJewelries.begin(), sortedJewelries.end(), compareByName);
+
+        for (const Jewelry& jewelry : sortedJewelries) {
+            totalValue += jewelry.getPrice() * jewelry.getWeight();
+        }
+
+        if (totalValue >= 500.0) {
+            outputFile << "Jewelry Store: " << store.getAddress() << std::endl;
+            outputFile << "Total Value: " << totalValue << std::endl;
+            for (const Jewelry& jewelry : sortedJewelries) {
+                outputFile << jewelry.getName() << std::endl;
+            }
+            outputFile << std::endl;
+        }
+    }
+
+    outputFile.close();
+}
+
+int main() {
+    std::vector<JewelryStore> jewelryStores;
+    readJewelryStores("jewelry_stores.txt", jewelryStores);
+
+    writeMetalList("metal_list.txt", jewelryStores);
+    writeSortedJewelries("sorted_jewelries.txt", jewelryStores);
+
+    return 0;
+}
+
+
+
+
+
+TXT
+Shop1 3
+Ring1 Gold 0.5 1000.0
+Earring1 Silver 0.3 500.0
+Necklace1 Gold 1.2 2000.0
+Shop2 2
+Ring2 Silver 0.8 800.0
+Earring2 Gold 0.4 600.0
+Shop3 1
+Necklace2 Gold 2.0 3000.0
+Shop4 4
+Ring3 Silver 1.0 1200.0
+Ring4 Gold 0.7 900.0
+Earring3 Silver 0.5 700.0
+Earring4 Gold 0.3 400.0
+
+
+
+
+
+
+
+
+//4. Визначити абстрактний тип Товар, похідні абстрактні Молочний товар, М’ясний
+товар. Та похідні: Молоко, Кефір, Ковбаса, М’ясо. В текстовому файлі задано дані
+про 10 різних товарів. Зчитати ці дані в масив, відсортувати їх у порядку спадання
+кодів. Записати у новий файл список молочних товарів, ціна яких не перевищує
+задану. Вивести ті м’ясні товари, запас яких є більший за задане число.//
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+// Abstract Product class
+class Product {
+public:
+    virtual void display() = 0;
+    virtual int getCode() = 0;
+    virtual double getPrice() = 0;
+  
+};
+
+// Abstract DairyProduct class derived from Product
+class DairyProduct : public Product {
+public:
+    void display() override {
+        cout << "Dairy product" << endl;
+    }
+};
+
+// Abstract MeatProduct class derived from Product
+class MeatProduct : public Product {
+public:
+ virtual int getStock() = 0;
+    void display() override {
+        cout << "Meat product" << endl;
+    }
+};
+
+// Derived classes from DairyProduct
+class Milk : public DairyProduct {
+private:
+    int code;
+    double price;
+
+public:
+    Milk(int code, double price) : code(code), price(price) {}
+
+    int getCode() override {
+        return code;
+    }
+
+    double getPrice() override {
+        return price;
+    }
+
+    void display() override {
+        cout << "Milk (Code: " << code << ", Price: " << price << ")" << endl;
+    }
+};
+
+class Kefir : public DairyProduct {
+private:
+    int code;
+    double price;
+
+public:
+    Kefir(int code, double price) : code(code), price(price) {}
+
+    int getCode() override {
+        return code;
+    }
+
+    double getPrice() override {
+        return price;
+    }
+
+    void display() override {
+        cout << "Kefir (Code: " << code << ", Price: " << price << ")" << endl;
+    }
+};
+
+// Derived classes from MeatProduct
+class Sausage : public MeatProduct {
+private:
+    int code;
+    double price;
+    int stock;
+
+public:
+    Sausage(int code, double price, int stock) : code(code), price(price), stock(stock) {}
+
+    int getCode() override {
+        return code;
+    }
+
+    double getPrice() override {
+        return price;
+    }
+
+    int getStock() {
+        return stock;
+    }
+
+    void display() override {
+        cout << "Sausage (Code: " << code << ", Price: " << price << ", Stock: " << stock << ")" << endl;
+    }
+};
+
+class Meat : public MeatProduct {
+private:
+    int code;
+    double price;
+    int stock;
+
+public:
+    Meat(int code, double price, int stock) : code(code), price(price), stock(stock) {}
+
+    int getCode() override {
+        return code;
+    }
+
+    double getPrice() override {
+        return price;
+    }
+
+    int getStock() {
+        return stock;
+    }
+
+    void display() override {
+        cout << "Meat (Code: " << code << ", Price: " << price << ", Stock: " << stock << ")" << endl;
+    }
+};
+
+int main() {
+    ifstream inputFile("products.txt"); // Assuming the data file is named "products.txt"
+    ofstream dairyFile("dairy_products.txt"); // Output file for dairy products
+    double maxDairyPrice = 10.0; // Maximum price for dairy products
+    int minMeatStock = 50; // Minimum stock for meat products
+
+    vector<Product*> products;
+
+    if (inputFile.is_open()) {
+        int code;
+        double price;
+        int stock;
+        string productType;
+
+        while (inputFile >> code >> price >> stock >> productType) {
+            Product* product = nullptr;
+
+            if (productType == "Milk") {
+                product = new Milk(code, price);
+            } else if (productType == "Kefir") {
+                product = new Kefir(code, price);
+            } else if (productType == "Sausage") {
+                product = new Sausage(code, price, stock);
+            } else if (productType == "Meat") {
+                product = new Meat(code, price, stock);
+            }
+
+            if (product != nullptr) {
+                products.push_back(product);
+            }
+        }
+
+        inputFile.close();
+    } else {
+        cout << "Failed to open file." << endl;
+        return 1;
+    }
+
+    // Sort products in descending order based on codes
+    sort(products.begin(), products.end(), [](Product* a, Product* b) {
+        return a->getCode() > b->getCode();
+    });
+
+    // Write dairy products with price <= maxDairyPrice to the file
+    for (Product* product : products) {
+        DairyProduct* dairyProduct = dynamic_cast<DairyProduct*>(product);
+        if (dairyProduct && dairyProduct->getPrice() <= maxDairyPrice) {
+            dairyProduct->display();
+            dairyFile << "Code: " << dairyProduct->getCode() << ", Price: " << dairyProduct->getPrice() << endl;
+        }
+    }
+
+    dairyFile.close();
+
+    // Display meat products with stock > minMeatStock
+    for (Product* product : products) {
+        MeatProduct* meatProduct = dynamic_cast<MeatProduct*>(product);
+        Sausage* sausageProduct = dynamic_cast<Sausage*>(product);
+        if ((meatProduct && meatProduct->getStock() > minMeatStock) ||
+            (sausageProduct && sausageProduct->getStock() > minMeatStock)) {
+            meatProduct->display();
+        }
+    }
+
+    // Cleanup memory
+    for (Product* product : products) {
+        delete product;
+    }
+
+    return 0;
+}
+
+
+
+TXT
+123 5.99 100 Milk
+456 3.49 50 Kefir
+789 10.99 75 Sausage
+321 8.25 80 Milk
+654 4.99 60 Kefir
+987 12.49 90 Sausage
+135 6.99 70 Milk
+864 3.75 55 Kefir
+279 11.99 85 Sausage
+468 7.49 65 Milk
+
+
+
+
+
+
+
+
+//5. Визначити тип «Дія»(назва, час початку, тривалість) та тип «Розпорядок дня»
+(дата, список дій).
+В текстовому файлі задано дані про Розпорядок дня деякої особи. Зчитати ці дані і
+видрукувати у Файл1 загальну тривалість прогулянок. Якщо це менше ніж 2
+години, то замінити після обіденний перегляд TV на прогулянки так, щоб досягти 2 год.//
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+// Клас для представлення дії
+class Action {
+public:
+    string name;
+    int start_time;
+    int duration;
+
+    Action(string n, int start, int dur) : name(n), start_time(start), duration(dur) {}
+};
+
+// Клас для представлення розпорядку дня
+class Schedule {
+public:
+    string date;
+    vector<Action> actions;
+
+    Schedule(string d) : date(d) {}
+
+    void addAction(Action action) {
+        actions.push_back(action);
+    }
+};
+
+// Функція для обчислення загальної тривалості прогулянок
+int calculateTotalWalkDuration(const Schedule& schedule) {
+    int total_walk_duration = 0;
+
+    for (const Action& action : schedule.actions) {
+        if (action.name == "walk") {
+            total_walk_duration += action.duration;
+        }
+    }
+
+    return total_walk_duration;
+}
+
+int main() {
+    ifstream inputFile("file.txt");
+    if (!inputFile) {
+        cout << "Не вдалося відкрити файл." << endl;
+        return 1;
+    }
+
+    Schedule file("01.01.2023");
+
+    // Зчитуємо дані з файлу
+    string actionName;
+    int startTime;
+    int duration;
+
+    while (inputFile >> actionName >> startTime >> duration) {
+        Action action(actionName, startTime, duration);
+        file.addAction(action);
+    }
+
+    inputFile.close();
+
+    // Обчислюємо загальну тривалість прогулянок
+    int total_walk_duration = calculateTotalWalkDuration(file);
+    cout << "Загальна тривалість прогулянок: " << total_walk_duration << " год." << endl;
+
+    // Перевіряємо, чи тривалість менше 2 годин
+    if (total_walk_duration < 2) {
+        // Замінюємо після обіднього перегляду TV на прогулянки
+        for (Action& action : file.actions) {
+            if (action.name == "watch_TV" && action.start_time > 12) {
+                int remaining_duration = 2 - total_walk_duration;
+                if (remaining_duration <= 0) {
+                    break;
+                }
+                if (action.duration <= remaining_duration) {
+                    total_walk_duration += action.duration;
+                    remaining_duration -= action.duration;
+                    action.name = "walk";
+                    action.duration = remaining_duration;
+                } else {
+                    total_walk_duration += remaining_duration;
+                    action.duration -= remaining_duration;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Виводимо оновлений розпорядок дня у файл1
+    ofstream outputFile("file1.txt");
+    if (!outputFile) {
+        cout << "Не вдалося створити файл." << endl;
+        return 1;
+    }
+
+    outputFile << "Розпорядок дня: " << file.date << endl;
+    for (const Action& action : file.actions) {
+        outputFile << action.name << " " << action.start_time << " " << action.duration << endl;
+    }
+
+    outputFile.close();
+
+    return 0;
+}
+
+
+TXT
+walk 8 0
+watch_TV 10 0
+walk 12 1
+watch_TV 15 0
+walk 16 0
+
+
+
+
+
+
+
+
+//6. Визначити абстрактний тип Живий організм, похідні абстрактні Рослина,Тварина.
+Та відповідні похідні Трав’янисті рослини, Дерева, Риба, Птах. В текстовому
+файлі задано дані про 10 різних живих організмів. Записати у новий файл дані
+окремо про рослини – в алфавітному порядку назв, окремо про тварини – в порядку
+спадання кількості. Знайти всі рослини, занесені в червону книгу.//
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+// Абстрактний клас Живий організм
+class LivingOrganism {
+public:
+    virtual ~LivingOrganism() {}
+
+    virtual std::string getType() const = 0;
+    virtual std::string getName() const = 0;
+    virtual bool isInRedBook() const = 0;
+};
+
+// Похідний клас Рослина
+class Plant : public LivingOrganism {
+public:
+    Plant(const std::string& name, bool isInRedBook)
+        : name(name), redBook(isInRedBook) {}
+
+    std::string getType() const override {
+        return "Рослина";
+    }
+
+    std::string getName() const override {
+        return name;
+    }
+
+    bool isInRedBook() const override {
+        return redBook;
+    }
+
+private:
+    std::string name;
+    bool redBook;
+};
+
+// Похідний клас Тварина
+class Animal : public LivingOrganism {
+public:
+    Animal(const std::string& name, int quantity)
+        : name(name), quantity(quantity) {}
+
+    std::string getType() const override {
+        return "Тварина";
+    }
+
+    std::string getName() const override {
+        return name;
+    }
+
+    bool isInRedBook() const override {
+        return false;
+    }
+
+    int getQuantity() const {
+        return quantity;
+    }
+
+private:
+    std::string name;
+    int quantity;
+};
+
+// Функція для сортування по назві в алфавітному порядку
+bool sortByAlphabet(const LivingOrganism* a, const LivingOrganism* b) {
+    return a->getName() < b->getName();
+}
+
+// Функція для сортування за спаданням кількості
+bool sortByQuantity(const LivingOrganism* a, const LivingOrganism* b) {
+    return static_cast<const Animal*>(a)->getQuantity() > static_cast<const Animal*>(b)->getQuantity();
+}
+
+int main() {
+    // Створюємо вектор для зберігання живих організмів
+    std::vector<LivingOrganism*> organisms;
+
+    // Зчитуємо дані з текстового файлу
+    std::ifstream inputFile("organisms.txt");
+    std::string line;
+    while (std::getline(inputFile, line)) {
+        std::string type, name;
+        bool isInRedBook;
+        int quantity;
+
+        size_t delimiterPos = line.find(' ');
+        type = line.substr(0, delimiterPos);
+        line = line.substr(delimiterPos + 1);
+
+        delimiterPos = line.find(' ');
+        name = line.substr(0, delimiterPos);
+        line = line.substr(delimiterPos + 1);
+
+        delimiterPos = line.find(' ');
+        isInRedBook = line.substr(0, delimiterPos) == "1";
+        line = line.substr(delimiterPos + 1);
+
+        quantity = std::stoi(line);
+
+        // Залежно від типу створюємо об'єкт рослини або тварини і додаємо до вектора
+        if (type == "Рослина") {
+            organisms.push_back(new Plant(name, isInRedBook));
+        } else if (type == "Тварина") {
+            organisms.push_back(new Animal(name, quantity));
+        }
+    }
+    inputFile.close();
+
+    // Сортуємо рослини за алфавітом
+    std::sort(organisms.begin(), organisms.end(), sortByAlphabet);
+
+    // Записуємо рослини в новий файл
+    std::ofstream plantFile("plants.txt");
+    for (const auto& organism : organisms) {
+        if (organism->getType() == "Рослина") {
+            plantFile << organism->getName() << std::endl;
+        }
+    }
+    plantFile.close();
+
+    // Сортуємо тварин за спаданням кількості
+    std::sort(organisms.begin(), organisms.end(), sortByQuantity);
+
+    // Записуємо тварин в новий файл
+    std::ofstream animalFile("animals.txt");
+    for (const auto& organism : organisms) {
+        if (organism->getType() == "Тварина") {
+            animalFile << organism->getName() << std::endl;
+        }
+    }
+    animalFile.close();
+
+    // Знаходимо рослини, занесені в червону книгу
+    std::cout << "Рослини, занесені в червону книгу:" << std::endl;
+    for (const auto& organism : organisms) {
+        if (organism->getType() == "Рослина" && organism->isInRedBook()) {
+            std::cout << organism->getName() << std::endl;
+        }
+    }
+
+    // Звільняємо пам'ять
+    for (const auto& organism : organisms) {
+        delete organism;
+    }
+
+    return 0;
+}
+
+
+ТХТ
+Рослина Квітка 1 
+Тварина Лев 0 10
+Тварина Слон 0 5
+Рослина Дерево 0 
+Тварина Тигр 1 8
+Рослина Трава 1 
+Рослина Кущ 0 
+Тварина Вовк 0 7
+Рослина Квітка-орхідея 1 
+Тварина Жираф 0 4
+
+
+
+
+
+
+
+
+
+//7. Визначити тип «Шпаргалка»( предмет,номер ) та похідні від нього типи
+«Паперова»(розмір , місце переховування) та «Електронна» (назва носія).
+Визначити тип «Студент»(ПІП, група, список шпаргалок.
+В текстовому файлі задано дані про 2 студентів. Зчитати ці дані у масив і
+видрукувати у текстовий файл список всіх шпаргалок, посортованих за предметом
+та номерами. В інший текстовий файл вивести всі електронні шпаргалки на носіях
+«комп» та їх кількість.//
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+class SpickSheet {
+protected:
+    string subject;
+    int number;
+
+public:
+    SpickSheet(const string& subject, int number) : subject(subject), number(number) {}
+
+    bool operator<(const SpickSheet& other) const {
+        if (subject == other.subject)
+            return number < other.number;
+        return subject < other.subject;
+    }
+
+    const string& getSubject() const {
+        return subject;
+    }
+
+    int getNumber() const {
+        return number;
+    }
+
+    virtual void printDetails() const = 0;
+};
+
+class PaperSpickSheet : public SpickSheet {
+private:
+    string size;
+    string hidingPlace;
+
+public:
+    PaperSpickSheet(const string& subject, int number, const string& size, const string& hidingPlace)
+        : SpickSheet(subject, number), size(size), hidingPlace(hidingPlace) {}
+
+    void printDetails() const override {
+        cout << "Paper SpickSheet - Subject: " << subject << ", Number: " << number
+             << ", Size: " << size << ", Hiding Place: " << hidingPlace << endl;
+    }
+};
+
+class ElectronicSpickSheet : public SpickSheet {
+private:
+    string storageDevice;
+
+public:
+    ElectronicSpickSheet(const string& subject, int number, const string& storageDevice)
+        : SpickSheet(subject, number), storageDevice(storageDevice) {}
+
+    void printDetails() const override {
+        cout << "Electronic SpickSheet - Subject: " << subject << ", Number: " << number
+             << ", Storage Device: " << storageDevice << endl;
+    }
+
+    const string& getStorageDevice() const {
+        return storageDevice;
+    }
+};
+
+class Student {
+private:
+    string fullName;
+    string group;
+    vector<SpickSheet*> spickSheets;
+
+public:
+    Student(const string& fullName, const string& group) : fullName(fullName), group(group) {}
+
+    void addSpickSheet(SpickSheet* spickSheet) {
+        spickSheets.push_back(spickSheet);
+    }
+
+    void printSpickSheetsBySubjectAndNumber() const {
+        ofstream outputFile("sorted_spick_sheets.txt");
+
+        vector<SpickSheet*> sortedSpickSheets(spickSheets.begin(), spickSheets.end());
+        sort(sortedSpickSheets.begin(), sortedSpickSheets.end(),
+             [](const SpickSheet* a, const SpickSheet* b) { return *a < *b; });
+
+        for (const auto spickSheet : sortedSpickSheets) {
+            spickSheet->printDetails();
+            outputFile << "Subject: " << spickSheet->getSubject() << ", Number: " << spickSheet->getNumber() << endl;
+        }
+
+        outputFile.close();
+    }
+
+    int countElectronicSpickSheetsOnDevice(const string& storageDevice) const {
+        int count = 0;
+        for (const auto spickSheet : spickSheets) {
+            if (ElectronicSpickSheet* electronicSpickSheet = dynamic_cast<ElectronicSpickSheet*>(spickSheet)) {
+                if (electronicSpickSheet->getStorageDevice() == storageDevice)
+                    count++;
+            }
+        }
+        return count;
+    }
+};
+
+int main() {
+    // Create two students
+    Student student1("John Doe", "Group A");
+    Student student2("Jane Smith", "Group B");
+
+    // Add spick sheets to the students
+    student1.addSpickSheet(new PaperSpickSheet("Math", 1, "A5", "Under the desk"));
+    student1.addSpickSheet(new ElectronicSpickSheet("Physics", 2, "USB Drive"));
+    student1.addSpickSheet(new ElectronicSpickSheet("Math", 3, "Laptop"));
+
+    student2.addSpickSheet(new ElectronicSpickSheet("Chemistry", 1, "Computer"));
+    student2.addSpickSheet(new PaperSpickSheet("Physics", 2, "A6", "In the pocket"));
+    student2.addSpickSheet(new ElectronicSpickSheet("Math", 3, "Computer"));
+
+    // Print and save the sorted spick sheets
+    student1.printSpickSheetsBySubjectAndNumber();
+    student2.printSpickSheetsBySubjectAndNumber();
+
+    // Count electronic spick sheets on the "Computer" device
+    int countOnComputer1 = student1.countElectronicSpickSheetsOnDevice("Computer");
+    int countOnComputer2 = student2.countElectronicSpickSheetsOnDevice("Computer");
+
+    ofstream outputFile("electronic_spick_sheets.txt");
+    outputFile << "Student 1: " << countOnComputer1 << endl;
+    outputFile << "Student 2: " << countOnComputer2 << endl;
+    outputFile.close();
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+//8. Визначити абстрактний тип Телепередача, похідні абстрактні Розважальна
+передача, Науково-інформаційна передача. Та відповідні похідні: МультФільм,
+Шоу, Новини, Документальний фільм. В текстовому файлі задано дані про 10
+різних передач. Записати у новий файл передачі у часовому порядку. Вивести ті
+інформаційні програми, які будуть проходити до вказаного часу.//
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+class Teleperedacha {
+protected:
+    string nazva;
+    int triv;
+public:
+    Teleperedacha(string nazva, int triv) : nazva(nazva), triv(triv) {}
+    virtual ~Teleperedacha() {}
+
+    virtual void printInfo() const = 0;
+
+    bool operator<(const Teleperedacha& other) const {
+        return triv < other.triv;
+    }
+
+    int getTriv() const {
+        return triv;
+    }
+
+    const string& getNazva() const {
+        return nazva;
+    }
+};
+
+class RozvazhalnaPeredacha : public Teleperedacha {
+public:
+    RozvazhalnaPeredacha(string nazva, int triv) : Teleperedacha(nazva, triv) {}
+
+    void printInfo() const override {
+        cout << "Розважальна передача: " << nazva << ", тривалість: " << triv << " хв" << endl;
+    }
+};
+
+class NaukovoInformaciynaPeredacha : public Teleperedacha {
+public:
+    NaukovoInformaciynaPeredacha(string nazva, int triv) : Teleperedacha(nazva, triv) {}
+
+    void printInfo() const override {
+        cout << "Науково-інформаційна передача: " << nazva << ", тривалість: " << triv << " хв" << endl;
+    }
+};
+
+int main() {
+    vector<Teleperedacha*> teleperedachi;
+
+    // Зчитування даних з файлу
+    ifstream inputFile("teleperedachi.txt");
+    string nazva;
+    int triv;
+
+    while (inputFile >> nazva >> triv) {
+        Teleperedacha* teleperedacha;
+
+        // Створення відповідного типу передачі
+        if (nazva == "МультФільм") {
+            teleperedacha = new RozvazhalnaPeredacha(nazva, triv);
+        } else if (nazva == "Шоу" || nazva == "Новини" || nazva == "Документальний фільм") {
+            teleperedacha = new NaukovoInformaciynaPeredacha(nazva, triv);
+        } else {
+            cout << "Невідомий тип передачі: " << nazva << endl;
+            continue;
+        }
+
+        teleperedachi.push_back(teleperedacha);
+    }
+
+    inputFile.close();
+
+    // Сортування за тривалістю
+    sort(teleperedachi.begin(), teleperedachi.end(), [](const Teleperedacha* a, const Teleperedacha* b) {
+        return *a < *b;
+    });
+
+    // Виведення відсортованих передач
+    ofstream outputFile("teleperedachi_sorted.txt");
+    for (const auto& teleperedacha : teleperedachi) {
+        teleperedacha->printInfo();
+        outputFile << teleperedacha->getTriv() << " " << teleperedacha->getNazva() << endl;
+    }
+    outputFile.close();
+
+    // Виведення інформаційних програм, які проходять до заданого часу
+
+    int specifiedTime;
+    cout << "Введіть заданий час: ";
+    cin >> specifiedTime;
+
+    cout << "Інформаційні програми, які проходять до " << specifiedTime << " хв:" << endl;
+    for (const auto& teleperedacha : teleperedachi) {
+        if (teleperedacha->getTriv() <= specifiedTime && dynamic_cast<NaukovoInformaciynaPeredacha*>(teleperedacha)) {
+            teleperedacha->printInfo();
+        }
+    }
+
+    // Звільнення пам'яті
+    for (const auto& teleperedacha : teleperedachi) {
+        delete teleperedacha;
+    }
+
+    return 0;
+}
+
+
+TXT
+МультФільм 90
+Шоу 60
+Новини 30
+Документальний фільм 120
+МультФільм 80
+Шоу 93
+Новини 45
+Документальний фільм 300
+
+
+
+
+
+
+
+
+
+//9. Визначити два типи «Стіл» (розмір, матеріал, ціна) та «Стілець»(матеріал, ціна).
+Визначити тип «Набір меблів», що містить назву, стіл, набір стільців, їх кількість .
+В текстовому файлі задано дані про 10 столів та крісел. Зчитати ці дані в масиви.
+За введеним матеріалом, кількістю стільців та розміром стола утворити набір
+меблів, який зберегти у відповідний масив наборів. Видрукувати у файл дані про
+утворений набір і його вартість.
+З рештою меблів утворити можливі набори меблів (за матеріалом) і додати їх до
+масиву наборів. Видрукувати у файл2 утворені набори .//
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+struct Table {
+    int size;
+    string material;
+    float price;
+};
+
+struct Chair {
+    string material;
+    float price;
+};
+
+struct FurnitureSet {
+    string name;
+    Table table;
+    vector<Chair> chairs;
+    int chairCount;
+};
+
+void readTablesAndChairs(vector<Table>& tables, vector<Chair>& chairs) {
+    ifstream inFile("furniture.txt");
+    if (!inFile) {
+        cout << "Помилка відкриття файлу!" << endl;
+        return;
+    }
+
+    int tableSize;
+    string tableMaterial;
+    float tablePrice;
+    string chairMaterial;
+    float chairPrice;
+
+    for (int i = 0; i < 10; i++) {
+        inFile >> tableSize >> tableMaterial >> tablePrice >> chairMaterial >> chairPrice;
+        Table table = {tableSize, tableMaterial, tablePrice};
+        tables.push_back(table);
+
+        Chair chair = {chairMaterial, chairPrice};
+        chairs.push_back(chair);
+    }
+
+    inFile.close();
+}
+
+void saveFurnitureSetToFile(const FurnitureSet& furnitureSet, ofstream& outFile) {
+    outFile << "Набір меблів: " << furnitureSet.name << endl;
+    outFile << "Стіл: розмір=" << furnitureSet.table.size << ", матеріал=" << furnitureSet.table.material << ", ціна=" << furnitureSet.table.price << endl;
+    outFile << "Стільці: матеріал=" << furnitureSet.chairs[0].material << ", ціна=" << furnitureSet.chairs[0].price << endl;
+    outFile << "Кількість стільців: " << furnitureSet.chairCount << endl;
+    outFile << "Вартість набору: " << (furnitureSet.table.price + furnitureSet.chairCount * furnitureSet.chairs[0].price) << endl;
+    outFile << endl;
+}
+
+void createFurnitureSets(const vector<Table>& tables, const vector<Chair>& chairs, vector<FurnitureSet>& furnitureSets, const string& material, int chairCount, int tableSize) {
+    for (int i = 0; i < tables.size(); i++) {
+        if (tables[i].material == material && tables[i].size == tableSize) {
+            FurnitureSet furnitureSet;
+            furnitureSet.name = "Набір " + to_string(i + 1);
+            furnitureSet.table = tables[i];
+            furnitureSet.chairCount = chairCount;
+
+            for (int j = 0; j < chairCount; j++) {
+                furnitureSet.chairs.push_back(chairs[i]);
+            }
+
+            furnitureSets.push_back(furnitureSet);
+        }
+    }
+}
+
+void saveFurnitureSetsToFile(const vector<FurnitureSet>& furnitureSets, ofstream& outFile) {
+    for (const auto& furnitureSet : furnitureSets) {
+        outFile << "Набір меблів: " << furnitureSet.name << endl;
+        outFile << "Стіл: розмір=" << furnitureSet.table.size << ", матеріал=" << furnitureSet.table.material << ", ціна=" << furnitureSet.table.price << endl;
+        outFile << "Стільці: матеріал=" << furnitureSet.chairs[0].material << ", ціна=" << furnitureSet.chairs[0].price << endl;
+        outFile << "Кількість стільців: " << furnitureSet.chairCount << endl;
+        outFile << "Вартість набору: " << (furnitureSet.table.price + furnitureSet.chairCount * furnitureSet.chairs[0].price) << endl;
+        outFile << endl;
+    }
+}
+
+int main() {
+    vector<Table> tables;
+    vector<Chair> chairs;
+
+    readTablesAndChairs(tables, chairs);
+
+    string material;
+    int chairCount, tableSize;
+
+    cout << "Введіть матеріал: ";
+    cin >> material;
+    cout << "Введіть кількість стільців: ";
+    cin >> chairCount;
+    cout << "Введіть розмір стола: ";
+    cin >> tableSize;
+
+    vector<FurnitureSet> furnitureSets;
+    createFurnitureSets(tables, chairs, furnitureSets, material, chairCount, tableSize);
+
+    ofstream outFile1("furniture_set.txt");
+    if (!outFile1) {
+        cout << "Помилка відкриття файлу!" << endl;
+        return 1;
+    }
+
+    if (!furnitureSets.empty()) {
+        saveFurnitureSetToFile(furnitureSets[0], outFile1);
+        cout << "Дані про утворений набір збережено у файл furniture_set.txt." << endl;
+    } else {
+        cout << "Набір не знайдено." << endl;
+    }
+
+    outFile1.close();
+
+    vector<FurnitureSet> otherFurnitureSets;
+    createFurnitureSets(tables, chairs, otherFurnitureSets, material, chairCount, tableSize);
+
+    ofstream outFile2("other_furniture_sets.txt");
+    if (!outFile2) {
+        cout << "Помилка відкриття файлу!" << endl;
+        return 1;
+    }
+
+    if (!otherFurnitureSets.empty()) {
+        saveFurnitureSetsToFile(otherFurnitureSets, outFile2);
+        cout << "Дані про утворені набори збережено у файл other_furniture_sets.txt." << endl;
+    } else {
+        cout << "Набори не знайдено." << endl;
+    }
+
+    outFile2.close();
+
+    return 0;
+}
+
+
+
+
+
+
+TXT
+Набір меблів: Набір 1
+Стіл: розмір=80, матеріал=дерево, ціна=200.00
+Стільці: матеріал=шкіра, ціна=50.00
+Кількість стільців: 4
+Вартість набору: 400.00
+
+Набір меблів: Набір 2
+Стіл: розмір=90, матеріал=скло, ціна=150.00
+Стільці: матеріал=метал, ціна=30.00
+Кількість стільців: 2
+Вартість набору: 210.00
+
+Набір меблів: Набір 3
+Стіл: розмір=70, матеріал=дерево, ціна=180.00
+Стільці: матеріал=шкіра, ціна=50.00
+Кількість стільців: 6
+Вартість набору: 480.00
+
+Набір меблів: Набір 4
+Стіл: розмір=75, матеріал=метал, ціна=120.00
+Стільці: матеріал=пластик, ціна=20.00
+Кількість стільців: 3
+Вартість набору: 180.00
+
+Набір меблів: Набір 5
+Стіл: розмір=85, матеріал=скло, ціна=250.00
+Стільці: матеріал=шкіра, ціна=50.00
+Кількість стільців: 8
+Вартість набору: 650.00
+
+Набір меблів: Набір 6
+Стіл: розмір=95, матеріал=дерево, ціна=300.00
+Стільці: матеріал=метал, ціна=30.00
+Кількість стільців: 4
+Вартість набору: 420.00
+
+Набір меблів: Набір 7
+Стіл: розмір=80, матеріал=скло, ціна=180.00
+Стільці: матеріал=пластик, ціна=20.00
+Кількість стільців: 6
+Вартість набору: 300.00
+
+Набір меблів: Набір 8
+Стіл: розмір=70, матеріал=метал, ціна=100.00
+Стільці: матеріал=шкіра, ціна=50.00
+Кількість стільців: 2
+Вартість набору: 200.00
+
+Набір меблів: Набір 9
+Стіл: розмір=90, матеріал=дерево, ціна=220.00
+Стільці: матеріал=пластик, ціна=20.00
+Кількість стільців: 4
+Вартість набору: 300.00
+
+Набір меблів: Набір 10
+Стіл: розмір=85, матеріал=скло, ціна=200.00
+Стільці: матеріал=метал, ціна=30.00
+Кількість стільців: 6
+Вартість набору: 380.00
+
+
+
+
+
+
+
+
+
+//10. Визначити абстрактний тип для представлення Навчального закладу, похідні
+абстрактні Вищий н.з., Середній н.з. Та відповідні похідні Університет, Академія,
+Школа. В текстовому файлі задано дані про 10 різних навчальних закладів. Вивести
+їх у новий файл в алфавітному порядку назв. Вивести ті вищі н.з., кількість
+студентів в яких перевищує задане число.//
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+class EducationalInstitution {
+public:
+    virtual std::string getName() const = 0;
+    virtual int getNumberOfStudents() const = 0;
+};
+
+class HigherEducationalInstitution : public EducationalInstitution {
+public:
+    std::string getName() const override { return "Higher Educational Institution"; }
+};
+
+class University : public HigherEducationalInstitution {
+public:
+    std::string getName() const override { return "University"; }
+    int getNumberOfStudents() const override { return 1000; }
+};
+
+class Academy : public HigherEducationalInstitution {
+public:
+    std::string getName() const override { return "Academy"; }
+    int getNumberOfStudents() const override { return 800; }
+};
+
+class MiddleEducationalInstitution : public EducationalInstitution {
+public:
+    std::string getName() const override { return "Middle Educational Institution"; }
+};
+
+class School : public MiddleEducationalInstitution {
+public:
+    std::string getName() const override { return "School"; }
+    int getNumberOfStudents() const override { return 500; }
+};
+
+int main() {
+    std::vector<EducationalInstitution*> institutions;
+    institutions.push_back(new University());
+    institutions.push_back(new Academy());
+    institutions.push_back(new School());
+
+    std::ofstream outputFile("institutions.txt");
+    if (outputFile.is_open()) {
+        for (const auto& institution : institutions) {
+            outputFile << institution->getName() << ", " << institution->getNumberOfStudents() << " students" << std::endl;
+        }
+        outputFile.close();
+    } else {
+        std::cout << "Unable to open the file.";
+    }
+
+    std::ifstream inputFile("institutions.txt");
+    std::vector<std::string> institutionNames;
+
+    if (inputFile.is_open()) {
+        std::string line;
+        while (getline(inputFile, line)) {
+            institutionNames.push_back(line);
+        }
+        inputFile.close();
+    } else {
+        std::cout << "Unable to open the file.";
+    }
+
+    std::sort(institutionNames.begin(), institutionNames.end());
+
+    std::ofstream sortedFile("sorted_institutions.txt");
+    if (sortedFile.is_open()) {
+        for (const auto& name : institutionNames) {
+            sortedFile << name << std::endl;
+        }
+        sortedFile.close();
+    } else {
+        std::cout << "Unable to open the file.";
+    }
+
+    for (const auto& institution : institutions) {
+        delete institution;
+    }
+
+    return 0;
+}
+
+
+
+
+TXT
+University, 1000 students
+Academy, 800 students
+School, 500 students
+
+
+
+
+
+
+
+
+
+
+
+
+//11. Визначити абстрактний тип «Електроприлад» (назва, фірма, ціна). Визначити 3
+похідні від нього типи: «Порохотяг» (потужність,колір ), «Пральна машина»
+(кількість програм, об’єм ), «Комбайн» (потужність, кількість функцій).
+В текстовому файлі задано дані про 7 різних електроприладів. Зчитати дані в один
+масив і вивести у Файл1 всі електроприлади, посортовані за назвою із зазначенням
+їх кількості. Вивести у Файл2 список назв та загальну вартість електроприладів
+вказаної фірми.//
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+class Electropribor {
+protected:
+    string name;
+    string company;
+    double price;
+
+public:
+    Electropribor(const string& name, const string& company, double price)
+        : name(name), company(company), price(price) {}
+
+    virtual ~Electropribor() {}
+
+    virtual void printDetails(ostream& out) const = 0;
+    virtual double calculateTotalPrice() const = 0;
+
+    string getName() const {
+        return name;
+    }
+
+    string getCompany() const {
+        return company;
+    }
+
+    double getPrice() const {
+        return price;
+    }
+};
+
+class Porohotyag : public Electropribor {
+private:
+    int power;
+    string color;
+
+public:
+    Porohotyag(const string& name, const string& company, double price, int power, const string& color)
+        : Electropribor(name, company, price), power(power), color(color) {}
+
+    void printDetails(ostream& out) const override {
+        out << "Name: " << name << ", Company: " << company << ", Price: " << price
+            << ", Power: " << power << ", Color: " << color << endl;
+    }
+
+    double calculateTotalPrice() const override {
+        return price;
+    }
+};
+
+class PralnaMashyna : public Electropribor {
+private:
+    int programCount;
+    double volume;
+
+public:
+    PralnaMashyna(const string& name, const string& company, double price, int programCount, double volume)
+        : Electropribor(name, company, price), programCount(programCount), volume(volume) {}
+
+    void printDetails(ostream& out) const override {
+        out << "Name: " << name << ", Company: " << company << ", Price: " << price
+            << ", Program Count: " << programCount << ", Volume: " << volume << endl;
+    }
+
+    double calculateTotalPrice() const override {
+        return price;
+    }
+};
+
+class Kombayn : public Electropribor {
+private:
+    int power;
+    int functionCount;
+
+public:
+    Kombayn(const string& name, const string& company, double price, int power, int functionCount)
+        : Electropribor(name, company, price), power(power), functionCount(functionCount) {}
+
+    void printDetails(ostream& out) const override {
+        out << "Name: " << name << ", Company: " << company << ", Price: " << price
+            << ", Power: " << power << ", Function Count: " << functionCount << endl;
+    }
+
+    double calculateTotalPrice() const override {
+        return price;
+    }
+};
+
+void printElectropribors(const vector<Electropribor*>& electropribors, ostream& out) {
+    for (const Electropribor* electropribor : electropribors) {
+        electropribor->printDetails(out);
+    }
+}
+
+double calculateTotalPrice(const vector<Electropribor*>& electropribors) {
+    double totalPrice = 0.0;
+    for (const Electropribor* electropribor : electropribors) {
+        totalPrice += electropribor->calculateTotalPrice();
+    }
+    return totalPrice;
+}
+
+bool sortByElectropriborName(const Electropribor* a, const Electropribor* b) {
+    return a->getName() < b->getName();
+}
+
+void writeToFile(const vector<Electropribor*>& electropribors, const string& filename) {
+    ofstream file(filename);
+    if (file.is_open()) {
+        printElectropribors(electropribors, file);
+        file.close();
+        cout << "Data has been written to " << filename << endl;
+    } else {
+        cerr << "Unable to open file: " << filename << endl;
+    }
+}
+
+int main() {
+    vector<Electropribor*> electropribors;
+
+    // Зчитування даних з файлу
+    ifstream inputFile("input.txt");
+    if (inputFile.is_open()) {
+        string name, company;
+        double price;
+        int power, programCount, functionCount;
+        string color;
+        double volume;
+
+        while (inputFile >> name >> company >> price) {
+            if (name == "Porohotyag") {
+                inputFile >> power >> color;
+                electropribors.push_back(new Porohotyag(name, company, price, power, color));
+            } else if (name == "PralnaMashyna") {
+                inputFile >> programCount >> volume;
+                electropribors.push_back(new PralnaMashyna(name, company, price, programCount, volume));
+            } else if (name == "Kombayn") {
+                inputFile >> power >> functionCount;
+                electropribors.push_back(new Kombayn(name, company, price, power, functionCount));
+            }
+        }
+
+        inputFile.close();
+    } else {
+        cerr << "Unable to open input file." << endl;
+        return 1;
+    }
+
+    // Сортування за назвою
+    sort(electropribors.begin(), electropribors.end(), sortByElectropriborName);
+
+    // Запис у Файл1
+    writeToFile(electropribors, "File1.txt");
+
+    // Знаходження загальної вартості електроприладів вказаної фірми
+    string specifiedCompany = "CompanyA";
+    double totalCompanyPrice = 0.0;
+    for (const Electropribor* electropribor : electropribors) {
+        if (electropribor->getCompany() == specifiedCompany) {
+            totalCompanyPrice += electropribor->getPrice();
+        }
+    }
+
+    // Запис у Файл2
+    ofstream file2("File2.txt");
+    if (file2.is_open()) {
+        file2 << "Total price of electropribors from " << specifiedCompany << ": " << totalCompanyPrice << endl;
+        file2.close();
+        cout << "Data has been written to File2.txt" << endl;
+    } else {
+        cerr << "Unable to open File2.txt" << endl;
+    }
+
+    // Очищення пам'яті
+    for (Electropribor* electropribor : electropribors) {
+        delete electropribor;
+    }
+
+    return 0;
+}
+
+
+TXT
+Porohotyag CompanyA 100.0 1500 Red
+PralnaMashyna CompanyB 200.0 5 8.5
+Kombayn CompanyA 500.0 200 3
+Porohotyag CompanyA 130.0 1540 Red
+PralnaMashyna CompanyB 670.0 5 8.5
+Kombayn CompanyA 230.0 230 3
+
+
+
+
+
+
+
+
+
+
+
+//12. Визначити тип: «Ягода» (назва, колір, список вітамінів) та тип «Компот»(назва,
+кількість ягід, список ягід).
+В текстовому файлі задано дані про 10 різних ягід. Зчитати ці дані в масив.
+Утворити стільки компотів, скільки різних кольорів ягід є у списку. Заповнити
+таким чином масив компотів і вивести його у текстовий файл.
+Для кожного компоту видрукувати (без повторів ) список вітамінів.//
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <set>
+#include <algorithm>
+
+class Berry {
+protected:
+    std::string name;
+    std::string color;
+    std::set<std::string> vitamins;
+
+public:
+    Berry(const std::string& _name, const std::string& _color, const std::set<std::string>& _vitamins)
+        : name(_name), color(_color), vitamins(_vitamins) {}
+
+    const std::string& getName() const {
+        return name;
+    }
+
+    const std::string& getColor() const {
+        return color;
+    }
+
+    const std::set<std::string>& getVitamins() const {
+        return vitamins;
+    }
+};
+
+class Compote {
+private:
+    std::string name;
+    int berryCount;
+    std::vector<const Berry*> berries;
+
+public:
+    Compote(const std::string& _name, int _berryCount, const std::vector<const Berry*>& _berries)
+        : name(_name), berryCount(_berryCount), berries(_berries) {}
+
+    const std::string& getName() const {
+        return name;
+    }
+
+    int getBerryCount() const {
+        return berryCount;
+    }
+
+    const std::vector<const Berry*>& getBerries() const {
+        return berries;
+    }
+};
+
+void readBerries(const std::string& filename, std::vector<const Berry*>& berries) {
+    std::ifstream inputFile(filename);
+    if (!inputFile) {
+        std::cout << "Failed to open input file." << std::endl;
+        return;
+    }
+
+    std::string name, color;
+    int vitaminCount;
+    std::set<std::string> vitamins;
+
+    while (inputFile >> name >> color >> vitaminCount) {
+        vitamins.clear();
+        std::string vitamin;
+        for (int i = 0; i < vitaminCount; i++) {
+            inputFile >> vitamin;
+            vitamins.insert(vitamin);
+        }
+
+        const Berry* berry = new Berry(name, color, vitamins);
+        berries.push_back(berry);
+    }
+
+    inputFile.close();
+}
+
+void writeCompotes(const std::string& filename, const std::vector<Compote>& compotes) {
+    std::ofstream outputFile(filename);
+    if (!outputFile) {
+        std::cout << "Failed to open output file." << std::endl;
+        return;
+    }
+
+    for (const Compote& compote : compotes) {
+        outputFile << "Name: " << compote.getName() << std::endl;
+        outputFile << "Berry Count: " << compote.getBerryCount() << std::endl;
+
+        std::set<std::string> vitamins;
+        for (const Berry* berry : compote.getBerries()) {
+            const std::set<std::string>& berryVitamins = berry->getVitamins();
+            vitamins.insert(berryVitamins.begin(), berryVitamins.end());
+        }
+
+        outputFile << "Vitamins: ";
+        for (const std::string& vitamin : vitamins) {
+            outputFile << vitamin << " ";
+        }
+        outputFile << std::endl;
+
+        outputFile << std::endl;
+    }
+
+    outputFile.close();
+}
+
+int main() {
+    std::vector<const Berry*> berries;
+    readBerries("berries.txt", berries);
+
+    std::set<std::string> uniqueColors;
+    for (const Berry* berry : berries) {
+        uniqueColors.insert(berry->getColor());
+    }
+
+    std::vector<Compote> compotes;
+    for (const std::string& color : uniqueColors) {
+        std::vector<const Berry*> matchingBerries;
+        for (const Berry* berry : berries) {
+            if (berry->getColor() == color) {
+                matchingBerries.push_back(berry);
+            }
+        }
+        compotes.push_back(Compote(color + " Compote", matchingBerries.size(), matchingBerries));
+    }
+
+    writeCompotes("compotes.txt", compotes);
+
+    for (const Berry* berry : berries) {
+        delete berry;
+    }
+
+    return 0;
+}
+
+TXT
+Strawberry Red 3 VitaminA VitaminC VitaminE
+Blueberry Blue 2 VitaminC VitaminK
+Raspberry Red 2 VitaminB VitaminE
+Blackberry Black 3 VitaminC VitaminK VitaminE
+Cherry Red 1 VitaminA
+Grape Green 2 VitaminC VitaminK
+Cranberry Red 2 VitaminC VitaminA
+Mulberry Purple 1 VitaminE
+Gooseberry Green 2 VitaminC VitaminA
+Elderberry Black 3 VitaminB VitaminC VitaminE
+
+
+
+
+
+
+
+
+
+//Задача 1: 
+Визначити два типи "Співробітник" (ім'я, посада) та "Проект" (назва, дата початку, дата закінчення). У текстовому файлі задані дані про 5 проектів. Ввести дані з файлу в контейнер проектів. 
+а) Вивести на консоль список проектів, посортованих за назвою проекту, а для кожного проекту вивести список співробітників, посортованих за посадою. 
+б) Записати у файл список всіх посад, які зустрічаються у співробітників без повторів. //
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <set>
+
+using namespace std;
+
+struct Employee {
+    string name;
+    string position;
+};
+
+struct Project {
+    string name;
+    string startDate;
+    string endDate;
+    vector<Employee> employees;
+};
+
+bool compareProjectsByName(const Project& p1, const Project& p2) {
+    return p1.name < p2.name;
+}
+
+bool compareEmployeesByPosition(const Employee& e1, const Employee& e2) {
+    return e1.position < e2.position;
+}
+
+void displayProjects(const vector<Project>& projects) {
+    cout << "Projects sorted by name:" << endl;
+    for (const Project& project : projects) {
+        cout << "Project name: " << project.name << endl;
+        cout << "Start date: " << project.startDate << endl;
+        cout << "End date: " << project.endDate << endl;
+
+        cout << "Employees sorted by position:" << endl;
+        vector<Employee> sortedEmployees = project.employees;
+        sort(sortedEmployees.begin(), sortedEmployees.end(), compareEmployeesByPosition);
+
+        for (const Employee& employee : sortedEmployees) {
+            cout << "Name: " << employee.name << ", Position: " << employee.position << endl;
+        }
+        cout << endl;
+    }
+}
+
+void writePositionsToFile(const vector<Project>& projects, const string& fileName) {
+    set<string> positions;
+    for (const Project& project : projects) {
+        for (const Employee& employee : project.employees) {
+            positions.insert(employee.position);
+        }
+    }
+
+    ofstream outputFile(fileName);
+    if (outputFile.is_open()) {
+        for (const string& position : positions) {
+            outputFile << position << endl;
+        }
+        outputFile.close();
+        cout << "Positions written to file: " << fileName << endl;
+    } else {
+        cout << "Unable to open file: " << fileName << endl;
+    }
+}
+
+int main() {
+    vector<Project> projects;
+    ifstream inputFile("projects.txt");
+
+    if (inputFile.is_open()) {
+        for (int i = 0; i < 5; ++i) {
+            Project project;
+            getline(inputFile, project.name);
+            getline(inputFile, project.startDate);
+            getline(inputFile, project.endDate);
+
+            int numEmployees;
+            inputFile >> numEmployees;
+            inputFile.ignore(); // Ignore the newline character after the number of employees
+
+            for (int j = 0; j < numEmployees; ++j) {
+                Employee employee;
+                getline(inputFile, employee.name);
+                getline(inputFile, employee.position);
+                project.employees.push_back(employee);
+            }
+
+            projects.push_back(project);
+        }
+        inputFile.close();
+
+        sort(projects.begin(), projects.end(), compareProjectsByName);
+        displayProjects(projects);
+        writePositionsToFile(projects, "positions.txt");
+    } else {
+        cout << "Unable to open file: projects.txt" << endl;
+    }
+
+    return 0;
+}
+
+
+TXT:
+Project 1
+2023-01-01
+2023-02-01
+2
+John Doe
+Manager
+Jane Smith
+Developer
+Project 2
+2023-02-01
+2023-03-01
+1
+Alice Johnson
+Tester
+Project 3
+2023-03-01
+2023
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Визначити два типи «Годування» (час, продукт) та «Тваринка» (назва, контейнер Годувань). В текстовому файлі задані дані про 5 тварин. Ввести дані з файлу в контейнер тварин.
+а) Вивести на консоль, посортувавши за назвою тваринки, а для кожної тваринки годування повинні бути посортовані по часу від ранку до вечора.
+б) Вивести список продуктів, що зустрічаються у годуванні тварин, без повторів у файл. //
+
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <set>
+#include <algorithm>
+
+// Structure for Feeding
+struct Feeding {
+    std::string time;
+    std::string product;
+};
+
+// Structure for Animal
+struct Animal {
+    std::string name;
+    std::vector<Feeding> feedings;
+};
+
+// Function to compare feedings by time
+bool compareFeedings(const Feeding& feeding1, const Feeding& feeding2) {
+    return feeding1.time < feeding2.time;
+}
+
+// Function to compare animals by name
+bool compareAnimals(const Animal& animal1, const Animal& animal2) {
+    return animal1.name < animal2.name;
+}
+
+int main() {
+    // Container to hold animals
+    std::vector<Animal> animals;
+
+    // Read data from the file
+    std::ifstream inputFile("data.txt");
+    if (!inputFile) {
+        std::cerr << "Failed to open the file." << std::endl;
+        return 1;
+    }
+
+    std::string line;
+    while (std::getline(inputFile, line)) {
+        // Split the line into name, time, and product
+        std::string name, time, product;
+        std::istringstream iss(line);
+        if (!(iss >> name >> time >> product)) {
+            std::cerr << "Failed to read data from the file." << std::endl;
+            return 1;
+        }
+
+        // Check if the animal already exists in the container
+        bool found = false;
+        for (auto& animal : animals) {
+            if (animal.name == name) {
+                // Add the feeding to the animal
+                animal.feedings.push_back({time, product});
+                found = true;
+                break;
+            }
+        }
+
+        // If the animal doesn't exist, create a new one and add it to the container
+        if (!found) {
+            animals.push_back({name, {{time, product}}});
+        }
+    }
+
+    // Sort animals by name
+    std::sort(animals.begin(), animals.end(), compareAnimals);
+
+    // Sort feedings for each animal by time
+    for (auto& animal : animals) {
+        std::sort(animal.feedings.begin(), animal.feedings.end(), compareFeedings);
+    }
+
+    // Display the sorted data
+    for (const auto& animal : animals) {
+        std::cout << "Animal: " << animal.name << std::endl;
+        for (const auto& feeding : animal.feedings) {
+            std::cout << "  Time: " << feeding.time << ", Product: " << feeding.product << std::endl;
+        }
+        std::cout << std::endl;
+    }
+
+    // Extract unique products from feedings
+    std::set<std::string> uniqueProducts;
+    for (const auto& animal : animals) {
+        for (const auto& feeding : animal.feedings) {
+            uniqueProducts.insert(feeding.product);
+        }
+    }
+
+    // Write unique products to a file
+    std::ofstream outputFile("products.txt");
+    if (!outputFile) {
+        std::cerr << "Failed to create the output file." << std::endl;
+        return 1;
+    }
+
+    for (const auto& product : uniqueProducts) {
+        outputFile << product << std::endl;
+    }
+
+    std::cout << "Unique products have been written to the file 'products.txt'." << std::endl;
+
+    return 0;
+}
+
+TXT
+Lion 09:00 Meat
+Lion 12:00 Vegetables
+Lion 18:00 Fish
+Elephant 08:00 Hay
+Elephant 14:00 Grass
+Elephant 19:00 Fruits
+Giraffe 10:00 Leaves
+Giraffe 13:00 Grass
+Giraffe 16:00 Hay
+Monkey 08:30 Fruits
+Monkey 11:30 Nuts
+Monkey 15:00 Bananas
+Zebra 07:00 Grass
+Zebra 11:00 Leaves
+Zebra 17:30 Hay
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Визначити клас «Дія»(назва, тривалість) – «прогулянка», «навчання», «їжа», «друзі», клас «Розпорядок дня» (дата, список дій) та клас «Розпорядок на тиждень», який міститиме розпорядок на 7 днів та ім’я особи. В текстовому файлі задано дані про Розпорядок тижня 2 осіб.
+Б) Зчитати дані з файлу і видрукувати на консоль ім’я особи та той Розпорядок дня, в якому є найбільше Дій.
+В)Порахувати для кожного особи загальну тривалість всіх дій «прогулянка» протягом тижня Результат вивести в текстовий файл.//
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+class Action {
+public:
+    std::string name;
+    int duration;
+
+    Action(const std::string& name, int duration) : name(name), duration(duration) {}
+};
+
+class DailySchedule {
+public:
+    std::string date;
+    std::vector<Action> actions;
+
+    DailySchedule(const std::string& date) : date(date) {}
+
+    void addAction(const Action& action) {
+        actions.push_back(action);
+    }
+
+    bool operator<(const DailySchedule& other) const {
+        return actions.size() < other.actions.size();
+    }
+};
+
+class WeeklySchedule {
+public:
+    std::string personName;
+    std::vector<DailySchedule> dailySchedules;
+
+    WeeklySchedule(const std::string& personName) : personName(personName) {}
+
+    void addDailySchedule(const DailySchedule& dailySchedule) {
+        dailySchedules.push_back(dailySchedule);
+    }
+};
+
+void printScheduleWithMostActions(const std::vector<WeeklySchedule>& weeklySchedules) {
+    for (const auto& weeklySchedule : weeklySchedules) {
+        std::cout << "Person: " << weeklySchedule.personName << std::endl;
+
+        const DailySchedule& scheduleWithMostActions =
+            *std::max_element(weeklySchedule.dailySchedules.begin(), weeklySchedule.dailySchedules.end());
+
+        std::cout << "Date: " << scheduleWithMostActions.date << std::endl;
+        std::cout << "Actions:" << std::endl;
+
+        for (const auto& action : scheduleWithMostActions.actions) {
+            std::cout << "Name: " << action.name << ", Duration: " << action.duration << " minutes" << std::endl;
+        }
+
+        std::cout << std::endl;
+    }
+}
+
+void calculateTotalWalkDuration(const std::vector<WeeklySchedule>& weeklySchedules, const std::string& filename) {
+    std::ofstream outFile(filename);
+    if (outFile.is_open()) {
+        for (const auto& weeklySchedule : weeklySchedules) {
+            int totalWalkDuration = 0;
+
+            for (const auto& dailySchedule : weeklySchedule.dailySchedules) {
+                for (const auto& action : dailySchedule.actions) {
+                    if (action.name == "walk") {
+                        totalWalkDuration += action.duration;
+                    }
+                }
+            }
+
+            outFile << "Person: " << weeklySchedule.personName << std::endl;
+            outFile << "Total walk duration: " << totalWalkDuration << " minutes" << std::endl;
+            outFile << std::endl;
+        }
+
+        outFile.close();
+        std::cout << "Total walk durations written to file: " << filename << std::endl;
+    } else {
+        std::cerr << "Failed to open file: " << filename << std::endl;
+    }
+}
+
+int main() {
+    std::vector<WeeklySchedule> weeklySchedules;
+
+    std::ifstream inFile("schedule_data.txt");
+    if (inFile.is_open()) {
+        std::string line;
+        while (std::getline(inFile, line)) {
+            std::string personName = line;
+            WeeklySchedule weeklySchedule(personName);
+
+            for (int i = 0; i < 7; i++) {
+                std::getline(inFile, line);
+                std::string date = line;
+                DailySchedule dailySchedule(date);
+
+                for (int j = 0; j < 5; j++) {
+                    std::getline(inFile, line);
+                    std::string actionName = line.substr(0, line.find(' '));
+                    int duration = std::stoi(line.substr(line.find(' ') + 1));
+                    Action action(actionName, duration);
+                    dailySchedule.addAction(action);
+                }
+
+                weeklySchedule.addDailySchedule(dailySchedule);
+            }
+
+            weeklySchedules.push_back(weeklySchedule);
+        }
+
+        inFile.close();
+    } else {
+        std::cerr << "Failed to open file: schedule_data.txt" << std::endl;
+        return 1;
+    }
+
+    std::cout << "Schedule with most actions:" << std::endl;
+    printScheduleWithMostActions(weeklySchedules);
+
+    calculateTotalWalkDuration(weeklySchedules, "total_walk_durations.txt");
+
+    return 0;
+}
+
+TXT:
+Person1
+Date1
+walk 30
+study 60
+eat 20
+friends 40
+Date2
+...
+Person2
+...
+

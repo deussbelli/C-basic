@@ -1,0 +1,1893 @@
+
+
+// Визначити шаблонну функцію, яка підраховує кількість елементів,
+ відмінних від вказаного i-го елемента в масиві. Передбачити перехоплення винятків при невірному значенні i.//
+
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <iterator>
+
+using namespace std;
+
+template <typename V>
+vector <V>  ElemFunc(vector<V> container, V elem1, V elem2)
+{
+	vector <V> twocoint;
+	typename vector<V>::iterator first = find(container.begin(), container.end(), elem1);
+	typename vector<V>::iterator second = find(container.begin(), container.end(), elem2);
+
+	copy(first+1,  second, back_inserter(twocoint));
+
+	if (twocoint.empty())
+		copy(container.begin(), container.begin() + container.size() / 2, back_inserter(twocoint));
+
+	return twocoint;
+}
+
+template <typename T>
+int Count(T* array,  int size)
+{
+	int i;
+	cin >> i;
+
+	if (i < 0 || i > size)
+		throw out_of_range("Invalid i.");
+
+	T element = array[i];
+
+	int notres = count_if(array, array + size, [element](T x) {return x == element; });
+
+	int result = size - notres;
+
+	return result;
+}
+
+int main()
+{
+	int arr1[] = { 0, 3, 1 , 5, 3, 4 };
+	int r = Count(arr1, 6);
+	cout << r;
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Створити шаблонну функцію, яка отримує контейнер елементів певного типу V і два елементи elem1 та elem2. Функція повинна перемістити в інший контейнер всі елементи контейнера, які лежать в діапазоні [elem1, elem2], якщо таких елементів немає, в новий контейнер потрібно скопіювати першу половину заданого контейнера. Новий контейнер функція повинна повернути
+Перевірити роботу цієї функції на прикладі контейнерів дійсних чисел і контейнері рядків. //
+
+#include <iostream>
+#include <vector>
+
+template<typename T>
+std::vector<T> processContainer(const std::vector<T>& elements, const T& elem1, const T& elem2) {
+    std::vector<T> result;
+    bool foundRange = false;
+
+    for (const auto& element : elements) {
+        if (element >= elem1 && element <= elem2) {
+            result.push_back(element);
+            foundRange = true;
+        }
+    }
+
+    if (!foundRange) {
+        // Копіюємо першу половину заданого контейнера
+        size_t halfSize = elements.size() / 2;
+        result.insert(result.end(), elements.begin(), elements.begin() + halfSize);
+    }
+
+    return result;
+}
+
+int main() {
+    std::vector<double> doubleContainer = {1.5, 2.7, 3.2, 4.9, 5.0};
+    double doubleElem1 = 2.0;
+    double doubleElem2 = 5.0;
+
+    std::vector<std::string> stringContainer = {"apple", "banana", "cherry", "date", "dragonfruit"};
+    std::string stringElem1 = "banana";
+    std::string stringElem2 = "dragonfruit";
+
+    // Обробка контейнера дійсних чисел
+    std::vector<double> processedDoubleContainer = processContainer(doubleContainer, doubleElem1, doubleElem2);
+    std::cout << "Processed Double Container: ";
+    for (const auto& element : processedDoubleContainer) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+
+    // Обробка контейнера рядків
+    std::vector<std::string> processedStringContainer = processContainer(stringContainer, stringElem1, stringElem2);
+    std::cout << "Processed String Container: ";
+    for (const auto& element : processedStringContainer) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+// Бібліотека ЅT Створити функцію, яка отримує деякий текст і повинна утворити контейнер, в якому будуть усі символи з цього тексту із вказанням скільки разів вони входять в текст. 
+Видрукувати ті символи, які зустрічаються не менше ніж 2 рази. Утворений контейнер повернути. 
+Перевірити роботу функції на деякому введеному тексті. Перехопити винятки, пов'язані з тим, що текст не містить символів взагалі//
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+std::unordered_map<char, int> countCharacters(const std::string& text) {
+    std::unordered_map<char, int> charCount;
+
+    for (char c : text) {
+        charCount[c]++;
+    }
+
+    return charCount;
+}
+
+std::vector<char> getRepeatedCharacters(const std::unordered_map<char, int>& charCount) {
+    std::vector<char> repeatedChars;
+
+    for (const auto& entry : charCount) {
+        if (entry.second >= 2) {
+            repeatedChars.push_back(entry.first);
+        }
+    }
+
+    return repeatedChars;
+}
+
+int main() {
+    std::string text;
+    std::cout << "Введіть текст: ";
+    std::getline(std::cin, text);
+
+    try {
+        std::unordered_map<char, int> charCount = countCharacters(text);
+        std::vector<char> repeatedChars = getRepeatedCharacters(charCount);
+
+        if (repeatedChars.empty()) {
+            std::cout << "У тексті немає символів, які зустрічаються більше ніж 1 раз." << std::endl;
+        } else {
+            std::cout << "Символи, які зустрічаються більше ніж 1 раз: ";
+            for (char c : repeatedChars) {
+                std::cout << c << " ";
+            }
+            std::cout << std::endl;
+        }
+    } catch (const std::exception& e) {
+        std::cout << "Виникла помилка: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Створіть шаблонну функцію, яка отримує контейнер елементів певного типу V і знаходить середнє значення всіх елементів у контейнері. Функція повинна повертати середнє значення.//
+
+#include <iostream>
+#include <vector>
+
+template <typename V>
+double calculateAverage(const std::vector<V>& container) {
+    if (container.empty()) {
+        std::cerr << "Error: Container is empty." << std::endl;
+        return 0.0;
+    }
+
+    double sum = 0.0;
+    for (const auto& element : container) {
+        sum += static_cast<double>(element);
+    }
+
+    return sum / container.size();
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 2, 3, 4, 5 };
+    double intAverage = calculateAverage(intContainer);
+    std::cout << "Average of intContainer: " << intAverage << std::endl;
+
+    std::vector<double> doubleContainer{ 1.5, 2.5, 3.5, 4.5, 5.5 };
+    double doubleAverage = calculateAverage(doubleContainer);
+    std::cout << "Average of doubleContainer: " << doubleAverage << std::endl;
+
+    return 0;
+}
+
+
+
+
+
+//Створіть шаблонну функцію, яка отримує контейнер елементів певного типу V і повертає кількість входжень певного елемента в контейнер.//
+#include <iostream>
+#include <vector>
+
+template <typename V>
+int countOccurrences(const std::vector<V>& container, const V& element) {
+    int count = 0;
+    for (const auto& el : container) {
+        if (el == element) {
+            count++;
+        }
+    }
+    return count;
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 2, 3, 2, 4, 2, 5 };
+    int element = 2;
+    int occurrences = countOccurrences(intContainer, element);
+    std::cout << "Occurrences of " << element << " in intContainer: " << occurrences << std::endl;
+
+    std::vector<double> doubleContainer{ 1.5, 2.5, 3.5, 2.5, 4.5, 2.5, 5.5 };
+    double doubleElement = 2.5;
+    int doubleOccurrences = countOccurrences(doubleContainer, doubleElement);
+    std::cout << "Occurrences of " << doubleElement << " in doubleContainer: " << doubleOccurrences << std::endl;
+
+    return 0;
+}
+
+
+
+
+
+
+//Створіть шаблонну функцію, яка отримує контейнер елементів певного типу V і знаходить максимальний елемент в контейнері. Функція повинна повернути цей максимальний елемент.//
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+template <typename V>
+V findMax(const std::vector<V>& container) {
+    if (container.empty()) {
+        std::cerr << "Error: Container is empty." << std::endl;
+        return V();
+    }
+
+    auto maxElement = std::max_element(container.begin(), container.end());
+    return *maxElement;
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 5, 3, 2, 4 };
+    int maxInt = findMax(intContainer);
+    std::cout << "Maximum element in intContainer: " << maxInt << std::endl;
+
+    std::vector<double> doubleContainer{ 1.5, 5.5, 3.5, 2.5, 4.5 };
+    double maxDouble = findMax(doubleContainer);
+    std::cout << "Maximum element in doubleContainer: " << maxDouble << std::endl;
+
+    return 0;
+}
+
+
+
+
+
+
+
+//Створіть шаблонну функцію, яка отримує контейнер елементів певного типу V і повертає суму всіх елементів у контейнері.//
+#include <iostream>
+#include <vector>
+
+template <typename V>
+V calculateSum(const std::vector<V>& container) {
+    V sum = V();
+    for (const auto& element : container) {
+        sum += element;
+    }
+    return sum;
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 2, 3, 4, 5 };
+    int intSum = calculateSum(intContainer);
+    std::cout << "Sum of elements in intContainer: " << intSum << std::endl;
+
+    std::vector<double> doubleContainer{ 1.5, 2.5, 3.5, 4.5, 5.5 };
+    double doubleSum = calculateSum(doubleContainer);
+    std::cout << "Sum of elements in doubleContainer: " << doubleSum << std::endl;
+
+    return 0;
+}
+
+
+
+
+//Створіть шаблонну функцію, яка отримує контейнер елементів певного типу V і перевіряє, чи всі елементи в контейнері є унікальними. Функція повинна повертати логічне значення (true або false) в залежності від результату перевірки.//
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+
+template <typename V>
+bool areAllElementsUnique(const std::vector<V>& container) {
+    std::unordered_set<V> uniqueSet;
+    for (const V& element : container) {
+        if (uniqueSet.count(element) > 0) {
+            return false;  // Duplicate element found
+        }
+        uniqueSet.insert(element);
+    }
+    return true;  // All elements are unique
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 2, 3, 4, 5 };
+    bool areUnique = areAllElementsUnique(intContainer);
+    if (areUnique) {
+        std::cout << "All elements in intContainer are unique." << std::endl;
+    } else {
+        std::cout << "There are duplicate elements in intContainer." << std::endl;
+    }
+
+    std::vector<char> charContainer{ 'a', 'b', 'c', 'c', 'd' };
+    areUnique = areAllElementsUnique(charContainer);
+    if (areUnique) {
+        std::cout << "All elements in charContainer are unique." << std::endl;
+    } else {
+        std::cout << "There are duplicate elements in charContainer." << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+//Створіть шаблонну функцію, яка отримує контейнер елементів певного типу V і повертає новий контейнер, який містить лише парні елементи з вихідного контейнера.//
+#include <iostream>
+#include <vector>
+
+template <typename V>
+std::vector<V> getEvenElements(const std::vector<V>& container) {
+    std::vector<V> evenElements;
+    for (const V& element : container) {
+        if (element % 2 == 0) {
+            evenElements.push_back(element);
+        }
+    }
+    return evenElements;
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    std::vector<int> evenElements = getEvenElements(intContainer);
+
+    std::cout << "Even elements: ";
+    for (const auto& element : evenElements) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+
+//Створіть шаблонну функцію, яка отримує контейнер елементів певного типу V і знаходить середнє квадратичне всіх елементів у контейнері. Функція повинна повертати середнє квадратичне значення.//
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+template <typename V>
+double calculateRootMeanSquare(const std::vector<V>& container) {
+    if (container.empty()) {
+        throw std::runtime_error("Error: Container is empty.");
+    }
+
+    double sumOfSquares = 0.0;
+    for (const V& element : container) {
+        sumOfSquares += static_cast<double>(element * element);
+    }
+
+    double rms = std::sqrt(sumOfSquares / container.size());
+    return rms;
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 2, 3, 4, 5 };
+    try {
+        double rms = calculateRootMeanSquare(intContainer);
+        std::cout << "Root Mean Square: " << rms << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    std::vector<double> doubleContainer{ 1.5, 2.5, 3.5, 4.5, 5.5 };
+    try {
+        double rms = calculateRootMeanSquare(doubleContainer);
+        std::cout << "Root Mean Square: " << rms << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+//Створіть шаблонну функцію, яка отримує контейнер елементів певного типу V і повертає новий контейнер, який містить елементи з вихідного контейнера, відсортовані в порядку зростання.//
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+template <typename V>
+std::vector<V> sortContainer(const std::vector<V>& container) {
+    std::vector<V> sortedContainer = container;
+    std::sort(sortedContainer.begin(), sortedContainer.end());
+    return sortedContainer;
+}
+
+int main() {
+    std::vector<int> intContainer{ 3, 1, 4, 1, 5, 9, 2, 6, 5 };
+
+    std::vector<int> sortedContainer = sortContainer(intContainer);
+
+    std::cout << "Sorted container: ";
+    for (const auto& element : sortedContainer) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+
+
+
+
+//Створіть шаблонну функцію, яка отримує контейнер елементів певного типу V і перевіряє, чи всі елементи в контейнері задовольняють певне умову. Функція повинна повертати логічне значення (true або false) в залежності від результату перевірки.//
+#include <iostream>
+#include <vector>
+#include <functional>
+
+template <typename V, typename Predicate>
+bool checkAllElements(const std::vector<V>& container, Predicate predicate) {
+    for (const V& element : container) {
+        if (!predicate(element)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int main() {
+    std::vector<int> intContainer{ 2, 4, 6, 8, 10 };
+
+    bool allEven = checkAllElements(intContainer, [](const int& element) {
+        return element % 2 == 0;
+    });
+
+    if (allEven) {
+        std::cout << "All elements are even." << std::endl;
+    } else {
+        std::cout << "Not all elements are even." << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+//Створіть шаблонну функцію, яка отримує два контейнери елементів певного типу V і повертає новий контейнер, який містить спільні елементи з обох вхідних контейнерів.//
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+template <typename V>
+std::vector<V> findCommonElements(const std::vector<V>& container1, const std::vector<V>& container2) {
+    std::vector<V> result;
+
+    for (const V& element : container1) {
+        if (std::find(container2.begin(), container2.end(), element) != container2.end()) {
+            result.push_back(element);
+        }
+    }
+
+    return result;
+}
+
+int main() {
+    std::vector<int> container1{ 1, 2, 3, 4, 5 };
+    std::vector<int> container2{ 4, 5, 6, 7, 8 };
+
+    std::vector<int> commonElements = findCommonElements(container1, container2);
+
+    std::cout << "Common elements: ";
+    for (const int& element : commonElements) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+
+
+
+
+
+//Визначити шаблонну функцію, яка приймає масив елементів певного типу T та повертає індекс першого входження елементу, що задовольняє певну умову. //
+#include <iostream>
+
+template <typename T>
+int findFirstIndex(const T* array, int size, bool (*condition)(const T&)) {
+    for (int i = 0; i < size; i++) {
+        if (condition(array[i])) {
+            return i;
+        }
+    }
+
+    return -1; // Return -1 if no element satisfies the condition
+}
+
+// Example condition: Check if the element is greater than 5
+bool isGreaterThanFive(const int& element) {
+    return element > 5;
+}
+
+int main() {
+    int array[] = { 1, 3, 5, 7, 9 };
+
+    int firstIndex = findFirstIndex(array, sizeof(array) / sizeof(array[0]), isGreaterThanFive);
+
+    if (firstIndex != -1) {
+        std::cout << "First element greater than 5 found at index: " << firstIndex << std::endl;
+    } else {
+        std::cout << "No element greater than 5 found" << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+ 
+//Створити шаблонну функцію, яка приймає контейнер елементів певного типу V та повертає кількість елементів, які задовольняють певну умову. //
+#include <iostream>
+#include <vector>
+
+template <typename V>
+int countElements(const std::vector<V>& container, bool (*condition)(const V&)) {
+    int count = 0;
+    for (const V& element : container) {
+        if (condition(element)) {
+            count++;
+        }
+    }
+    return count;
+}
+
+// Example condition: Check if the element is even
+bool isEven(const int& element) {
+    return element % 2 == 0;
+}
+
+int main() {
+    std::vector<int> intContainer = {1, 2, 3, 4, 5, 6};
+
+    int evenCount = countElements(intContainer, isEven);
+
+    std::cout << "Number of even elements: " << evenCount << std::endl;
+
+    return 0;
+}
+
+
+
+
+
+
+ 
+//Написати шаблонну функцію, яка приймає два контейнери елементів певного типу V та повертає новий контейнер, який містить перетин (спільні елементи) цих контейнерів. //
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+template <typename V>
+std::vector<V> getIntersection(const std::vector<V>& container1, const std::vector<V>& container2) {
+    std::vector<V> intersection;
+    
+    for (const V& element : container1) {
+        if (std::find(container2.begin(), container2.end(), element) != container2.end()) {
+            intersection.push_back(element);
+        }
+    }
+    
+    return intersection;
+}
+
+int main() {
+    std::vector<int> container1 = {1, 2, 3, 4, 5};
+    std::vector<int> container2 = {4, 5, 6, 7, 8};
+    
+    std::vector<int> intersection = getIntersection(container1, container2);
+    
+    std::cout << "Intersection: ";
+    for (const int& element : intersection) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+    
+    return 0;
+}
+
+
+
+
+
+ 
+//Створити шаблонну функцію, яка приймає контейнер елементів певного типу V та повертає новий контейнер, який містить лише унікальні елементи з вхідного контейнера (без повторень). //
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+
+template <typename V>
+std::vector<V> getUniqueElements(const std::vector<V>& container) {
+    std::unordered_set<V> uniqueSet(container.begin(), container.end());
+    std::vector<V> uniqueElements(uniqueSet.begin(), uniqueSet.end());
+    return uniqueElements;
+}
+
+int main() {
+    std::vector<int> container = {1, 2, 3, 2, 4, 5, 1, 3};
+    std::vector<int> uniqueElements = getUniqueElements(container);
+    
+    std::cout << "Unique elements: ";
+    for (const int& element : uniqueElements) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+    
+    return 0;
+}
+
+
+
+
+
+
+ 
+//Реалізувати шаблонну функцію, яка приймає контейнер елементів певного типу V та повертає новий контейнер, який містить елементи з вхідного контейнера в зворотному порядку. //
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+template <typename V>
+std::vector<V> reverseContainer(const std::vector<V>& container) {
+    std::vector<V> reversedContainer(container);
+    std::reverse(reversedContainer.begin(), reversedContainer.end());
+    return reversedContainer;
+}
+
+int main() {
+    std::vector<int> container = {1, 2, 3, 4, 5};
+    std::vector<int> reversedContainer = reverseContainer(container);
+    
+    std::cout << "Reversed container: ";
+    for (const int& element : reversedContainer) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+    
+    return 0;
+}
+
+
+
+
+
+ 
+ 
+//Створити шаблонну функцію, яка приймає контейнер елементів певного типу V та повертає новий контейнер, в якому елементи впорядковані за зростанням. //
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+template <typename V>
+std::vector<V> sortContainer(const std::vector<V>& container) {
+    std::vector<V> sortedContainer = container;
+    std::sort(sortedContainer.begin(), sortedContainer.end());
+    return sortedContainer;
+}
+
+int main() {
+    std::vector<int> intContainer = {5, 2, 9, 1, 7};
+    std::vector<int> sortedIntContainer = sortContainer(intContainer);
+    
+    std::cout << "Sorted Integers: ";
+    for (const int& number : sortedIntContainer) {
+        std::cout << number << " ";
+    }
+    std::cout << std::endl;
+    
+    std::vector<double> doubleContainer = {3.14, 1.23, 2.71, 0.99, 4.55};
+    std::vector<double> sortedDoubleContainer = sortContainer(doubleContainer);
+    
+    std::cout << "Sorted Doubles: ";
+    for (const double& number : sortedDoubleContainer) {
+        std::cout << number << " ";
+    }
+    std::cout << std::endl;
+    
+    return 0;
+}
+
+
+
+
+
+ 
+//Реалізувати шаблонну функцію, яка приймає два контейнери елементів певного типу V та повертає новий контейнер, який містить елементи, які присутні тільки в одному з контейнерів (об'єднання без спільних елементів). //
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <unordered_set>
+
+template <typename V>
+std::vector<V> uniqueUnion(const std::vector<V>& container1, const std::vector<V>& container2) {
+    std::unordered_set<V> uniqueElements;
+    std::vector<V> result;
+    
+    for (const V& element : container1) {
+        uniqueElements.insert(element);
+    }
+    
+    for (const V& element : container2) {
+        if (uniqueElements.find(element) == uniqueElements.end()) {
+            uniqueElements.insert(element);
+        }
+    }
+    
+    for (const V& element : uniqueElements) {
+        result.push_back(element);
+    }
+    
+    return result;
+}
+
+int main() {
+    std::vector<int> container1 = {1, 2, 3, 4, 5};
+    std::vector<int> container2 = {4, 5, 6, 7, 8};
+    
+    std::vector<int> result = uniqueUnion(container1, container2);
+    
+    std::cout << "Union of unique elements: ";
+    for (const int& element : result) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+    
+    return 0;
+}
+
+
+
+
+
+//Написати шаблонну функцію, яка приймає контейнер елементів певного типу V та видаляє всі повторюючіся елементи, залишаючи тільки перше входження кожного унікального елемента. //
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+
+template <typename V>
+void removeDuplicates(std::vector<V>& container) {
+    std::unordered_set<V> uniqueElements;
+    std::vector<V> result;
+    
+    for (const V& element : container) {
+        if (uniqueElements.find(element) == uniqueElements.end()) {
+            uniqueElements.insert(element);
+            result.push_back(element);
+        }
+    }
+    
+    container = result;
+}
+
+int main() {
+    std::vector<int> container = {1, 2, 3, 2, 4, 5, 1, 3, 6, 4};
+    
+    std::cout << "Original container: ";
+    for (const int& element : container) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+    
+    removeDuplicates(container);
+    
+    std::cout << "Container after removing duplicates: ";
+    for (const int& element : container) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+    
+    return 0;
+}
+
+
+
+
+
+
+
+ 
+//Створити шаблонну функцію, яка приймає контейнер елементів певного типу V та повертає новий контейнер, який містить елементи, перетворені за допомогою певної функції або лямбда-виразу. 
+Наприклад, виконати умовне подвоєння числових елементів або перетворення рядків у верхній регістр.//
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <functional>
+
+template <typename V, typename TransformFunc>
+std::vector<V> transformContainer(const std::vector<V>& container, TransformFunc transform) {
+    std::vector<V> result;
+    
+    for (const V& element : container) {
+        result.push_back(transform(element));
+    }
+    
+    return result;
+}
+
+int main() {
+    std::vector<int> intContainer = {1, 2, 3, 4, 5};
+    std::vector<std::string> stringContainer = {"hello", "world", "example"};
+    
+    std::cout << "Original integer container: ";
+    for (const int& element : intContainer) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+    
+    auto doubledContainer = transformContainer(intContainer, [](const int& element) {
+        return element * 2;
+    });
+    
+    std::cout << "Transformed integer container (doubled): ";
+    for (const int& element : doubledContainer) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+    
+    std::cout << "Original string container: ";
+    for (const std::string& element : stringContainer) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+    
+    auto uppercaseContainer = transformContainer(stringContainer, [](const std::string& element) {
+        std::string transformed = element;
+        std::transform(transformed.begin(), transformed.end(), transformed.begin(), ::toupper);
+        return transformed;
+    });
+    
+    std::cout << "Transformed string container (uppercase): ";
+    for (const std::string& element : uppercaseContainer) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+    
+    return 0;
+}
+
+
+
+
+
+
+ 
+//Створіть шаблонну функцію, яка перетворює контейнер символів у рядок, додаючи всі елементи контейнера разом. Передбачте перехоплення винятків у випадку, якщо контейнер не містить символів. //
+#include <iostream>
+#include <vector>
+#include <string>
+#include <stdexcept>
+
+template <typename Container>
+std::string containerToString(const Container& container) {
+    if (container.empty()) {
+        throw std::logic_error("Container is empty.");
+    }
+
+    std::string result;
+    for (const auto& element : container) {
+        result += element;
+    }
+
+    return result;
+}
+
+int main() {
+    std::vector<char> charContainer = {'H', 'e', 'l', 'l', 'o'};
+    std::vector<char> emptyContainer;
+
+    try {
+        std::string charString = containerToString(charContainer);
+        std::cout << "Converted string: " << charString << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error converting char container to string: " << e.what() << std::endl;
+    }
+
+    try {
+        std::string emptyString = containerToString(emptyContainer);
+        std::cout << "Converted string: " << emptyString << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error converting empty container to string: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+ 
+//Напишіть шаблонну функцію, яка визначає максимальний елемент у контейнері цілих чисел. Передбачте перехоплення винятків у випадку, коли контейнер порожній. //
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+
+template <typename Container>
+typename Container::value_type findMax(const Container& container) {
+    if (container.empty()) {
+        throw std::logic_error("Container is empty.");
+    }
+
+    typename Container::value_type maxElement = container[0];
+    for (const auto& element : container) {
+        if (element > maxElement) {
+            maxElement = element;
+        }
+    }
+
+    return maxElement;
+}
+
+int main() {
+    std::vector<int> numbers = {5, 2, 9, 1, 7};
+
+    try {
+        int maxNumber = findMax(numbers);
+        std::cout << "Maximum number: " << maxNumber << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error finding maximum element: " << e.what() << std::endl;
+    }
+
+    std::vector<int> emptyContainer;
+
+    try {
+        int maxNumber = findMax(emptyContainer);
+        std::cout << "Maximum number: " << maxNumber << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error finding maximum element: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+ 
+//Реалізуйте шаблонну функцію, яка обчислює суму всіх додатних елементів у контейнері чисел з плаваючою крапкою. Передбачте перехоплення винятків у випадку, коли контейнер не містить чисел з плаваючою крапкою. //
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+
+template <typename Container>
+typename Container::value_type calculateSumOfPositive(const Container& container) {
+    typename Container::value_type sum = 0;
+
+    bool foundPositive = false;
+    for (const auto& element : container) {
+        if (element > 0) {
+            foundPositive = true;
+            sum += element;
+        }
+    }
+
+    if (!foundPositive) {
+        throw std::logic_error("Container does not contain any positive floating-point numbers.");
+    }
+
+    return sum;
+}
+
+int main() {
+    std::vector<double> numbers = {3.5, -2.1, 4.7, -1.8, 6.2};
+
+    try {
+        double sum = calculateSumOfPositive(numbers);
+        std::cout << "Sum of positive numbers: " << sum << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating sum: " << e.what() << std::endl;
+    }
+
+    std::vector<double> emptyContainer;
+
+    try {
+        double sum = calculateSumOfPositive(emptyContainer);
+        std::cout << "Sum of positive numbers: " << sum << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating sum: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+ 
+//Створіть шаблонну функцію, яка знаходить медіану (середнє значення) контейнера чисел. Передбачте перехоплення винятків у випадку, коли контейнер порожній. //
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <stdexcept>
+
+template <typename Container>
+typename Container::value_type calculateMedian(const Container& container) {
+    if (container.empty()) {
+        throw std::logic_error("Container is empty.");
+    }
+
+    Container sortedContainer = container;
+    std::sort(sortedContainer.begin(), sortedContainer.end());
+
+    size_t size = sortedContainer.size();
+    size_t middle = size / 2;
+
+    if (size % 2 == 0) {
+        // Even number of elements, calculate average of middle two elements
+        return (sortedContainer[middle - 1] + sortedContainer[middle]) / 2;
+    } else {
+        // Odd number of elements, return middle element
+        return sortedContainer[middle];
+    }
+}
+
+int main() {
+    std::vector<int> numbers = {5, 2, 9, 1, 7};
+
+    try {
+        int median = calculateMedian(numbers);
+        std::cout << "Median: " << median << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating median: " << e.what() << std::endl;
+    }
+
+    std::vector<int> emptyContainer;
+
+    try {
+        int median = calculateMedian(emptyContainer);
+        std::cout << "Median: " << median << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating median: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+ 
+//Визначте шаблонну функцію, яка видаляє всі входження певного елемента з контейнера. Передбачте перехоплення винятків у випадку, якщо елемент не знайдено в контейнері. //
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <stdexcept>
+
+template <typename Container, typename T>
+void removeElement(Container& container, const T& element) {
+    auto it = std::remove(container.begin(), container.end(), element);
+
+    if (it == container.end()) {
+        throw std::logic_error("Element not found in container.");
+    }
+
+    container.erase(it, container.end());
+}
+
+int main() {
+    std::vector<int> numbers = {2, 5, 2, 9, 2, 1, 7};
+
+    try {
+        int elementToRemove = 2;
+        removeElement(numbers, elementToRemove);
+
+        std::cout << "After removing " << elementToRemove << ": ";
+        for (const auto& number : numbers) {
+            std::cout << number << " ";
+        }
+        std::cout << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error removing element: " << e.what() << std::endl;
+    }
+
+    try {
+        int elementToRemove = 4;
+        removeElement(numbers, elementToRemove);
+
+        std::cout << "After removing " << elementToRemove << ": ";
+        for (const auto& number : numbers) {
+            std::cout << number << " ";
+        }
+        std::cout << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error removing element: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+ 
+//Напишіть шаблонну функцію, яка перевіряє, чи містить контейнер певний елемент. Передбачте перехоплення винятків при невірному використанні контейнера. //
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <stdexcept>
+
+template <typename Container, typename T>
+bool containsElement(const Container& container, const T& element) {
+    try {
+        return std::find(container.begin(), container.end(), element) != container.end();
+    } catch (const std::exception& e) {
+        throw std::runtime_error("Error accessing container: " + std::string(e.what()));
+    }
+}
+
+int main() {
+    std::vector<int> numbers = {2, 5, 8, 4, 1};
+
+    try {
+        int elementToFind = 8;
+        bool contains = containsElement(numbers, elementToFind);
+        std::cout << "Container contains " << elementToFind << ": " << (contains ? "true" : "false") << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error checking element: " << e.what() << std::endl;
+    }
+
+    try {
+        int elementToFind = 6;
+        bool contains = containsElement(numbers, elementToFind);
+        std::cout << "Container contains " << elementToFind << ": " << (contains ? "true" : "false") << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error checking element: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+ 
+//Реалізуйте шаблонну функцію, яка обчислює суму всіх елементів у контейнері цілих чисел. Передбачте перехоплення винятків у випадку, коли контейнер порожній. //
+#include <iostream>
+#include <vector>
+#include <numeric>
+#include <stdexcept>
+
+template <typename Container>
+int calculateSum(const Container& container) {
+    try {
+        if (container.empty()) {
+            throw std::runtime_error("Container is empty");
+        }
+        return std::accumulate(container.begin(), container.end(), 0);
+    } catch (const std::exception& e) {
+        throw std::runtime_error("Error calculating sum: " + std::string(e.what()));
+    }
+}
+
+int main() {
+    std::vector<int> numbers = {2, 5, 8, 4, 1};
+
+    try {
+        int sum = calculateSum(numbers);
+        std::cout << "Sum: " << sum << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating sum: " << e.what() << std::endl;
+    }
+
+    try {
+        std::vector<int> emptyContainer;
+        int sum = calculateSum(emptyContainer);
+        std::cout << "Sum: " << sum << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating sum: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+ 
+//Створіть шаблонну функцію, яка знаходить найменший елемент у контейнері чисел з плаваючою крапкою. Передбачте перехоплення винятків у випадку, коли контейнер не містить чисел з плаваючою крапкою. //
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <stdexcept>
+
+template <typename Container>
+typename Container::value_type findSmallest(const Container& container) {
+    try {
+        if (container.empty()) {
+            throw std::runtime_error("Container is empty");
+        }
+        auto smallestElement = std::min_element(container.begin(), container.end());
+        if (smallestElement == container.end()) {
+            throw std::runtime_error("No floating-point numbers found");
+        }
+        return *smallestElement;
+    } catch (const std::exception& e) {
+        throw std::runtime_error("Error finding smallest element: " + std::string(e.what()));
+    }
+}
+
+int main() {
+    std::vector<double> numbers = {2.5, 1.2, 3.7, 0.8, 4.2};
+
+    try {
+        double smallest = findSmallest(numbers);
+        std::cout << "Smallest element: " << smallest << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error finding smallest element: " << e.what() << std::endl;
+    }
+
+    try {
+        std::vector<double> emptyContainer;
+        double smallest = findSmallest(emptyContainer);
+        std::cout << "Smallest element: " << smallest << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error finding smallest element: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+ 
+//Визначте шаблонну функцію, яка знаходить суму квадратів елементів у контейнері цілих чисел. Передбачте перехоплення винятків у випадку, коли контейнер порожній. //
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+
+template <typename Container>
+typename Container::value_type calculateSumOfSquares(const Container& container) {
+    try {
+        if (container.empty()) {
+            throw std::runtime_error("Container is empty");
+        }
+        typename Container::value_type sum = 0;
+        for (const auto& element : container) {
+            sum += element * element;
+        }
+        return sum;
+    } catch (const std::exception& e) {
+        throw std::runtime_error("Error calculating sum of squares: " + std::string(e.what()));
+    }
+}
+
+int main() {
+    std::vector<int> numbers = {1, 2, 3, 4, 5};
+
+    try {
+        int sum = calculateSumOfSquares(numbers);
+        std::cout << "Sum of squares: " << sum << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating sum of squares: " << e.what() << std::endl;
+    }
+
+    try {
+        std::vector<int> emptyContainer;
+        int sum = calculateSumOfSquares(emptyContainer);
+        std::cout << "Sum of squares: " << sum << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating sum of squares: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+ 
+//Напишіть шаблонну функцію, яка знаходить найбільший спільний дільник двох чисел. Передбачте перехоплення винятків у випадку, коли числа не можуть бути підібраними для обчислення спільного дільника. //
+#include <iostream>
+#include <stdexcept>
+
+template <typename T>
+T calculateGCD(T a, T b) {
+    try {
+        if (a == 0 && b == 0) {
+            throw std::invalid_argument("Cannot calculate GCD of two zeros");
+        }
+        
+        // Ensure a is non-negative
+        if (a < 0) {
+            a = -a;
+        }
+        
+        // Ensure b is non-negative
+        if (b < 0) {
+            b = -b;
+        }
+        
+        while (b != 0) {
+            T temp = b;
+            b = a % b;
+            a = temp;
+        }
+        
+        return a;
+    } catch (const std::exception& e) {
+        throw std::runtime_error("Error calculating GCD: " + std::string(e.what()));
+    }
+}
+
+int main() {
+    try {
+        int a = 12;
+        int b = 18;
+        int gcd = calculateGCD(a, b);
+        std::cout << "GCD of " << a << " and " << b << " is: " << gcd << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating GCD: " << e.what() << std::endl;
+    }
+    
+    try {
+        int a = 0;
+        int b = 0;
+        int gcd = calculateGCD(a, b);
+        std::cout << "GCD of " << a << " and " << b << " is: " << gcd << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating GCD: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+ 
+//Реалізуйте шаблонну функцію, яка перевіряє, чи є контейнер паліндромом (рядок, який читається однаково зліва направо і справа наліво). Передбачте перехоплення винятків у випадку, коли контейнер не містить елементів. //
+ #include <iostream>
+#include <vector>
+#include <stdexcept>
+#include <algorithm>
+
+template <typename T>
+bool isPalindrome(const std::vector<T>& container) {
+    if (container.empty()) {
+        throw std::runtime_error("Error: Container is empty.");
+    }
+
+    std::vector<T> reversedContainer = container;
+    std::reverse(reversedContainer.begin(), reversedContainer.end());
+
+    return container == reversedContainer;
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 2, 3, 2, 1 };
+    try {
+        bool isPal = isPalindrome(intContainer);
+        if (isPal) {
+            std::cout << "intContainer is a palindrome." << std::endl;
+        } else {
+            std::cout << "intContainer is not a palindrome." << std::endl;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    std::vector<int> emptyContainer;
+    try {
+        bool isPal = isPalindrome(emptyContainer);
+        if (isPal) {
+            std::cout << "emptyContainer is a palindrome." << std::endl;
+        } else {
+            std::cout << "emptyContainer is not a palindrome." << std::endl;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+//Створіть шаблонну функцію, яка обчислює суму всіх елементів у контейнері з дійсними числами. Передбачте перехоплення винятків у випадку, коли контейнер порожній. //
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+
+template <typename T>
+T calculateSum(const std::vector<T>& container) {
+    if (container.empty()) {
+        throw std::runtime_error("Error: Container is empty.");
+    }
+
+    T sum = 0;
+    for (const T& element : container) {
+        sum += element;
+    }
+
+    return sum;
+}
+
+int main() {
+    std::vector<double> doubleContainer{ 1.5, 2.7, 3.2, 4.8 };
+    try {
+        double sum = calculateSum(doubleContainer);
+        std::cout << "Sum of doubleContainer: " << sum << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    std::vector<double> emptyContainer;
+    try {
+        double emptySum = calculateSum(emptyContainer);
+        std::cout << "Sum of emptyContainer: " << emptySum << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+
+ 
+//Визначте шаблонну функцію, яка знаходить кількість унікальних елементів у контейнері. Передбачте перехоплення винятків у випадку, якщо контейнер не підтримує порівняння елементів. //
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+#include <stdexcept>
+
+template <typename T>
+size_t countUniqueElements(const std::vector<T>& container) {
+    try {
+        std::unordered_set<T> uniqueSet(container.begin(), container.end());
+        return uniqueSet.size();
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 0;
+    }
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 2, 3, 2, 4, 5, 1 };
+    size_t uniqueCount = countUniqueElements(intContainer);
+    std::cout << "Number of unique elements in intContainer: " << uniqueCount << std::endl;
+
+    std::vector<std::string> stringContainer{ "apple", "banana", "orange", "apple", "grape" };
+    uniqueCount = countUniqueElements(stringContainer);
+    std::cout << "Number of unique elements in stringContainer: " << uniqueCount << std::endl;
+
+    std::vector<char> charContainer{ 'a', 'b', 'c', 'b', 'd' };
+    uniqueCount = countUniqueElements(charContainer);
+    std::cout << "Number of unique elements in charContainer: " << uniqueCount << std::endl;
+
+    return 0;
+}
+
+
+
+
+
+ 
+//Напишіть шаблонну функцію, яка знаходить перший негативний елемент у контейнері цілих чисел. Передбачте перехоплення винятків у випадку, коли контейнер не містить від'ємних чисел. //
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+
+template <typename T>
+T findFirstNegative(const std::vector<T>& container) {
+    for (const T& element : container) {
+        if (element < 0) {
+            return element;
+        }
+    }
+
+    throw std::runtime_error("Error: Container does not contain negative numbers.");
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 2, -3, 4, -5 };
+    try {
+        int firstNegative = findFirstNegative(intContainer);
+        std::cout << "First negative element in intContainer: " << firstNegative << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    std::vector<int> positiveContainer{ 1, 2, 3, 4, 5 };
+    try {
+        int firstNegative = findFirstNegative(positiveContainer);
+        std::cout << "First negative element in positiveContainer: " << firstNegative << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+ 
+//Реалізуйте шаблонну функцію, яка обчислює добуток всіх елементів у контейнері цілих чисел. Передбачте перехоплення винятків у випадку, коли контейнер порожній. //
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+
+template <typename T>
+T calculateProduct(const std::vector<T>& container) {
+    if (container.empty()) {
+        throw std::runtime_error("Error: Container is empty.");
+    }
+
+    T product = 1;
+    for (const T& element : container) {
+        product *= element;
+    }
+
+    return product;
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 2, 3, 4, 5 };
+    try {
+        int product = calculateProduct(intContainer);
+        std::cout << "Product of intContainer: " << product << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    std::vector<int> emptyContainer;
+    try {
+        int emptyProduct = calculateProduct(emptyContainer);
+        std::cout << "Product of emptyContainer: " << emptyProduct << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+ 
+ 
+ 
+//Створіть шаблонну функцію, яка перевіряє, чи є контейнер впорядкованим в порядку зростання. Передбачте перехоплення винятків у випадку, коли контейнер не підтримує порівняння елементів. //
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <stdexcept>
+
+template <typename T>
+bool isContainerSorted(const std::vector<T>& container) {
+    try {
+        return std::is_sorted(container.begin(), container.end());
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+int main() {
+    std::vector<int> sortedIntContainer{ 1, 2, 3, 4, 5 };
+    if (isContainerSorted(sortedIntContainer)) {
+        std::cout << "sortedIntContainer is sorted in ascending order." << std::endl;
+    } else {
+        std::cout << "sortedIntContainer is not sorted in ascending order." << std::endl;
+    }
+
+    std::vector<int> unsortedIntContainer{ 5, 3, 2, 4, 1 };
+    if (isContainerSorted(unsortedIntContainer)) {
+        std::cout << "unsortedIntContainer is sorted in ascending order." << std::endl;
+    } else {
+        std::cout << "unsortedIntContainer is not sorted in ascending order." << std::endl;
+    }
+
+    std::vector<std::string> stringContainer{ "banana", "apple", "orange" };
+    if (isContainerSorted(stringContainer)) {
+        std::cout << "stringContainer is sorted in ascending order." << std::endl;
+    } else {
+        std::cout << "stringContainer is not sorted in ascending order." << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+ 
+//Визначте шаблонну функцію, яка знаходить середнє геометричне значення елементів у контейнері чисел. Передбачте перехоплення винятків у випадку, коли контейнер не містить чисел. //
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <stdexcept>
+
+template <typename T>
+double calculateGeometricMean(const std::vector<T>& container) {
+    if (container.empty()) {
+        throw std::runtime_error("Error: Container is empty.");
+    }
+
+    double product = 1.0;
+    for (const T& element : container) {
+        if (element <= 0) {
+            throw std::runtime_error("Error: Container contains non-positive values.");
+        }
+        product *= static_cast<double>(element);
+    }
+
+    return std::pow(product, 1.0 / container.size());
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 2, 3, 4, 5 };
+    try {
+        double intGeometricMean = calculateGeometricMean(intContainer);
+        std::cout << "Geometric mean of intContainer: " << intGeometricMean << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    std::vector<double> doubleContainer{ 1.5, 2.5, 3.5, 4.5, 5.5 };
+    try {
+        double doubleGeometricMean = calculateGeometricMean(doubleContainer);
+        std::cout << "Geometric mean of doubleContainer: " << doubleGeometricMean << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    std::vector<int> emptyContainer;
+    try {
+        double emptyGeometricMean = calculateGeometricMean(emptyContainer);
+        std::cout << "Geometric mean of emptyContainer: " << emptyGeometricMean << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+ 
+//Напишіть шаблонну функцію, яка виконує сортування контейнера елементів за зростанням. Передбачте перехоплення винятків у випадку, коли контейнер не підтримує порівняння елементів. //
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <stdexcept>
+
+template <typename T>
+void sortContainer(std::vector<T>& container) {
+    try {
+        std::sort(container.begin(), container.end());
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+}
+
+int main() {
+    std::vector<int> intContainer{ 5, 3, 2, 4, 1 };
+    sortContainer(intContainer);
+    std::cout << "Sorted intContainer: ";
+    for (const auto& element : intContainer) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+
+    std::vector<std::string> stringContainer{ "banana", "apple", "orange" };
+    sortContainer(stringContainer);
+    std::cout << "Sorted stringContainer: ";
+    for (const auto& element : stringContainer) {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+ 
+ 
+ 
+ 
+ 
+ 
+//Реалізуйте шаблонну функцію, яка знаходить найбільший елемент у контейнері цілих чисел. Передбачте перехоплення винятків у випадку, коли контейнер порожній.//
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+
+template <typename T>
+T findLargestElement(const std::vector<T>& container) {
+    if (container.empty()) {
+        throw std::runtime_error("Error: Container is empty.");
+    }
+
+    T largestElement = container[0];
+    for (const T& element : container) {
+        if (element > largestElement) {
+            largestElement = element;
+        }
+    }
+
+    return largestElement;
+}
+
+int main() {
+    std::vector<int> intContainer{ 1, 5, 3, 2, 4 };
+    try {
+        int largestInt = findLargestElement(intContainer);
+        std::cout << "Largest element in intContainer: " << largestInt << std::endl;
+    }
+    catch (const std::runtime_error& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    std::vector<int> emptyContainer;
+    try {
+        int largestEmpty = findLargestElement(emptyContainer);
+        std::cout << "Largest element in emptyContainer: " << largestEmpty << std::endl;
+    }
+    catch (const std::runtime_error& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+
+//Визначте шаблонну функцію, яка знаходить середнє арифметичне значення елементів у контейнері. Передбачте перехоплення винятків при використанні контейнера, який не підтримує арифметичні операції. //
+#include <iostream>
+#include <stdexcept>
+#include <numeric>
+#include <vector>
+
+template <typename Container>
+double calculateArithmeticMean(const Container& container) {
+    try {
+        if (container.empty()) {
+            throw std::invalid_argument("Cannot calculate mean of an empty container");
+        }
+        
+        typename Container::value_type sum = std::accumulate(container.begin(), container.end(), typename Container::value_type());
+        return static_cast<double>(sum) / container.size();
+    } catch (const std::exception& e) {
+        throw std::runtime_error("Error calculating arithmetic mean: " + std::string(e.what()));
+    }
+}
+
+int main() {
+    try {
+        std::vector<int> numbers = {1, 2, 3, 4, 5};
+        double mean = calculateArithmeticMean(numbers);
+        std::cout << "Arithmetic mean: " << mean << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating arithmetic mean: " << e.what() << std::endl;
+    }
+    
+    try {
+        std::vector<double> values = {1.5, 2.7, 3.8};
+        double mean = calculateArithmeticMean(values);
+        std::cout << "Arithmetic mean: " << mean << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calculating arithmetic mean: " << e.what() << std::endl;
+    }
+    
+    return 0;
+}
+
